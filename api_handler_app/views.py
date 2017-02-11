@@ -1354,10 +1354,10 @@ def get_holding(request):
             tomcat_count = requestObj.get_tomcat_count(tomcat_count)
             user_id = userId
             output = requestObj.send_request(bodyContent, url, authorization, user_id, tomcat_count, jKey, jData)
-            #dictionary = auditTrial.tso_response_audit (requestId, output,apiName,ApiHomeDict,SuccessDict,FailureDict)
-            #output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            #auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
-            logger.info(utilClass.readProperty("EXITING_METHOD"))
+            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,ApiHomeDict,SuccessDict,FailureDict)
+            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
+            auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
+            #logger.info(utilClass.readProperty("EXITING_METHOD"))
             return Response(output)
     
     except Exception as e:
