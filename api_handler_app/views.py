@@ -1,31 +1,15 @@
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from properties.p import Property
-from datetime import datetime
-from rest_framework.views import exception_handler
 from utils import UtilClass
 from validate import Validate
 from audit import AuditTrial
 from request import RequestClass
 
-
-
 import logging
-import requests
 import json
-import hashlib
-import urllib
-import urllib2
-import base64
-import xlrd
-import time
 
-from Crypto.PublicKey import RSA
-from Crypto import Random
-from Crypto.Cipher import PKCS1_v1_5
 from api_handler.wsgi import ReturnAllDict
-from api_handler_app.models import Audit
 
 e = ReturnAllDict()
 AllList = e.returnDict()
@@ -177,6 +161,7 @@ def get_login_mode(request):
             print "output final",output
             output = json.loads(output)
             dictionary =auditTrial.tso_response_audit (requestId, output,apiName,ApiHomeDict,SuccessDict,FailureDict)
+            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
             auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
             #logger.info(utilClass.readProperty("EXITING_METHOD"))
             return Response(output)            
@@ -211,16 +196,16 @@ def get_login_2fa(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             logger.debug("userId="+userId)
             jKey = requestObj.get_jkey(public_key3_pem)
-            userJSON=bodyContent = request.body
-            logger.debug("userJSON="+userJSON)
+            bodyContent = request.body
+            logger.debug("userJSON="+bodyContent)
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             logger.debug("requestId before input availability and format="+str(requestId))
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             logger.debug("result="+str(result))
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
-               auditTrial. api_response_audit (requestId, result, apiName,ApiHomeDict)
-               #logger.info(utilClass.readProperty("EXITING_METHOD"))
-               return Response (result)
+                auditTrial. api_response_audit (requestId, result, apiName,ApiHomeDict)
+                logger.info(utilClass.readProperty("EXITING_METHOD"))
+                return Response (result)
             jsonObject = json.loads (bodyContent)
             logger.debug("before validation_and_manipulation")
             result = validate.validation_and_manipulation (jsonObject, apiName, InputDict)
@@ -234,7 +219,7 @@ def get_login_2fa(request):
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
             public_key3=requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(userJSON,public_key3, 2048)
+                jData = requestObj.encrypt(jsonObject,public_key3, 2048)
             else:
                 raise Exception(utilClass.readProperty("ALGORITHM"))    
             tomcat_count=requestObj.get_tomcat_count(tomcat_count)
@@ -276,7 +261,7 @@ def get_login(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.requestObj.get_jkey(public_key3_pem)
-            userJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -312,76 +297,8 @@ def get_login(request):
         output=validate.createErrorResponse(err)
         auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
         return Response(output)
+
    
-
-
-'''Provide you with pre-authentication key for encryption'''
-@api_view(["POST"])
-def get_normal_login(request):
-    utilClass=UtilClass()
-    #logger.info(utilClass.readProperty("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    try:
-        if request.method == utilClass.readProperty ('METHOD_TYPE'):
-            url = ApiHomeDict.get(utilClass.readProperty("GET_PRE_AUTHENTICATION_KEY"))[0].url
-            apiName = utilClass.readProperty ("GET_PRE_AUTHENTICATION_KEY")
-            authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
-            authorization=authorization.split("-")
-            private_key2_pem=requestObj.b64_decode(authorization[0].replace("\n",""))
-            public_key3_pem = requestObj.b64_decode(authorization[1].replace("\n",""))
-            tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
-            userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-            jKey = requestObj.get_jkey(public_key3_pem)
-            userJSON=bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
-            if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
-                #logger.info(utilClass.readProperty("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, InputDict)
-            if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,ApiHomeDict)
-                #logger.info(utilClass.readProperty("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
-            json_data = json.dumps(result)
-            public_key3=requestObj.import_key(public_key3_pem)
-            if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(json_data, public_key3, 2048)
-            else:
-                raise Exception(utilClass.readProperty("ALGORITHM"))
-            tomcat_count=requestObj.get_tomcat_count(tomcat_count)
-            user_id=userId
-            output = requestObj.send_request(bodyContent, url, authorization, user_id, tomcat_count, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,ApiHomeDict,SuccessDict,FailureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
-            encrypted_data = output["jEncResp"]
-            private_key2 = requestObj.import_key(private_key2_pem)
-            if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
-                decrypted_data = requestObj.decrypt(encrypted_data,private_key2)
-            else:
-                raise Exception(utilClass.readProperty("ALGORITHM"))
-            decrypted_json = json.loads(decrypted_data)
-            #logger.info(utilClass.readProperty("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as e:
-        logger.exception(e)
-        err=str(e)
-        output=validate.createErrorResponse(err)
-        auditTrial.api_response_audit (requestId, output,apiName,ApiHomeDict)
-        return Response(output)   
-        
-
 '''Gives you information about client enabled data'''
 @api_view(["POST"])
 def get_default_login(request):
@@ -403,7 +320,7 @@ def get_default_login(request):
             tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON=bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -466,7 +383,7 @@ def get_valid_pwd(request):
             tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key3_pem)
-            userJSON=bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -530,7 +447,7 @@ def get_valid_ans(request):
             tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key3_pem)
-            userJSON=bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -559,7 +476,7 @@ def get_valid_ans(request):
             encrypted_data=output["jEncResp"]
             private_key2 = requestObj.import_key(private_key2_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
-                 decrypted_data=requestObj.decrypt(encrypted_data,private_key2)
+                decrypted_data=requestObj.decrypt(encrypted_data,private_key2)
             else:
                 raise Exception(utilClass.readProperty("ALGORITHM"))
             logger.debug(decrypted_data)
@@ -611,7 +528,7 @@ def get_account_info(request):
             tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON=bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -676,7 +593,7 @@ def get_load_retention_type(request):
             tomcat_count= requestObj.b64_decode(authorization[2].replace("\n",""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON=bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -738,7 +655,7 @@ def get_check_crkt_price_range(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -797,7 +714,7 @@ def get_validate_GTD(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -857,7 +774,7 @@ def get_validate_SLM_price(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -916,7 +833,7 @@ def get_place_order(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             print bodyContent
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
@@ -976,7 +893,7 @@ def get_order_book(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1037,7 +954,7 @@ def get_modify_order(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1095,7 +1012,7 @@ def get_cancel_order(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1154,7 +1071,7 @@ def get_order_history(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1212,7 +1129,7 @@ def get_trade_book(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1271,7 +1188,7 @@ def get_position_book(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1330,7 +1247,7 @@ def get_holding(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1389,7 +1306,7 @@ def get_limits(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1450,7 +1367,7 @@ def get_check_transaction_password(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1511,7 +1428,7 @@ def get_user_profile(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1573,7 +1490,7 @@ def get_open_orders(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1631,7 +1548,7 @@ def get_bo_holdings(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1690,7 +1607,7 @@ def get_bo_Ul_Trades(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -1749,7 +1666,7 @@ def get_logout(request):
             tomcat_count = requestObj.b64_decode(authorization[2].replace("\n", ""))
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
-            requestJSON = bodyContent = request.body
+            bodyContent = request.body
             requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
