@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from django.http import Http404, HttpResponse
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -83,6 +84,17 @@ INSTALLED_APPS = (
     'api_handler_app'
 )
 
+class Custom404Middleware(object):
+    def process_exception(self, request, exception):
+        if isinstance(exception, Http404):
+            # implement your custom logic. You can send
+            # http response with any template or message
+            # here. unicode(exception) will give the custom
+            # error message that was passed.
+            msg = unicode(exception)
+            print msg
+            return HttpResponse(msg, status=404)
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -92,6 +104,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'api_handler.settings.Custom404Middleware',
 )
 
 ROOT_URLCONF = 'api_handler.urls'

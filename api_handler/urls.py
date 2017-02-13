@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from api_handler_app import views
 admin.autodiscover()
@@ -13,7 +13,6 @@ urlpatterns = [
    url(r'^valid_ans/',views.get_valid_ans),
    url(r'^account_info/',views.get_account_info),
    url(r'^default_login/',views.get_default_login),
-   url(r'^normal_login/',views.get_normal_login),
    url(r'^login_mode/', views.get_login_mode),
    url(r'^login_by_pass/', views.get_login_by_pass),
    url(r'^load_retention_type/', views.get_load_retention_type),

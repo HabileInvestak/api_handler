@@ -11,6 +11,7 @@ import json
 
 from api_handler.wsgi import ReturnAllDict
 
+
 e = ReturnAllDict()
 AllList = e.returnDict()
 ApiHomeDict = AllList[0]
@@ -41,6 +42,9 @@ def get_initial_token(request):
     utilClass=UtilClass()
     ##logger.info(utilClass.readProperty("ENTERING_METHOD"))
     try:
+        ipAddress= request.META.get('REMOTE_ADDR', None)
+        #ipAddress=request.remote_addr #socket.gethostbyname(socket.gethostname())#request.environ.get('REMOTE_ADDR')
+        print 'ipAddress',ipAddress
         if request.method == utilClass.readProperty("METHOD_TYPE"):
             bodyContent = request.body
             url = ApiHomeDict.get(utilClass.readProperty("GET_INITIAL_KEY"))[0].url
@@ -219,7 +223,7 @@ def get_login_2fa(request):
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
             public_key3=requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonObject,public_key3, 2048)
+                jData = requestObj.encrypt(json.dumps(result),public_key3, 2048)
             else:
                 raise Exception(utilClass.readProperty("ALGORITHM"))    
             tomcat_count=requestObj.get_tomcat_count(tomcat_count)

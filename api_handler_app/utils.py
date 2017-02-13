@@ -36,7 +36,6 @@ class UtilClass():
                     value = self.password_hash (value)
                 data[key] = value
         except Exception as e:
-            print e
             raise e        
         logger.info(self.readProperty("EXITING_METHOD"))      
         return data
@@ -50,7 +49,7 @@ class UtilClass():
         try:
             json.loads(text)
             result = True 
-        except Exception as e:
+        except Exception:
             result = False
         logger.info(self.readProperty("EXITING_METHOD"))  
         return result

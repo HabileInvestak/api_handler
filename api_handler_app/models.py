@@ -24,7 +24,7 @@ class Audit(models.Model):
     api_response = models.TextField()
     api_status = models.TextField()
     tso_status = models.TextField()
-
+    apiName=models.TextField()
 
     class Meta:
         ordering = ('request_id',)

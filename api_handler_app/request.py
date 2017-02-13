@@ -161,35 +161,35 @@ class RequestClass():
         utilClass=UtilClass()
         #logger.info(utilClass.readProperty("ENTERING_METHOD"))
         try:
-            buffer = ""
+            buffer_var = ""
             number_of_bytes = ((int(utilClass.readProperty ('KEY_SIZE')) / int(utilClass.readProperty('BYTE_BOUNDARY'))) - int(utilClass.readProperty('BYTE_DIFFERENCE')))
             start = 0
             end = number_of_bytes
             if (number_of_bytes > len(data)):
                 end = len(data)
-            buffer = buffer + self.encrypt_block(key, data, start, end)
-            buffer = utilClass.append_data(buffer, "\n")
+            buffer_var = buffer_var + self.encrypt_block(key, data, start, end)
+            buffer_var = utilClass.append_data(buffer_var, "\n")
             start = end
             end += number_of_bytes
             if (end > len(data)):
                 end = len(data)
         
             while (end < len(data)):
-                buffer = buffer + self.encrypt_block(key, data, start, end)
-                buffer = utilClass.append_data(buffer, "\n")
+                buffer_var = buffer_var + self.encrypt_block(key, data, start, end)
+                buffer_var = utilClass.append_data(buffer_var, "\n")
                 start = end
                 end += number_of_bytes
                 if (end > len(data)):
                     end = len(data)
             if (end - start > 0):
-                buffer = buffer + self.encrypt_block(key, data, start, end)
-                buffer = utilClass.append_data(buffer, "\n")
-            buffer = self.b64_encode(buffer)
-            buffer = utilClass.replace_text(buffer, "\n", "")
+                buffer_var = buffer_var + self.encrypt_block(key, data, start, end)
+                buffer_var = utilClass.append_data(buffer_var, "\n")
+            buffer_var = self.b64_encode(buffer_var)
+            buffer_var = utilClass.replace_text(buffer_var, "\n", "")
         except Exception as e:
             raise e   
         #logger.info(utilClass.readProperty("EXITING_METHOD"))  
-        return buffer
+        return buffer_var
     
     
     '''This method is used to get decrypt data'''

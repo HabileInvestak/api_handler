@@ -1,6 +1,4 @@
-import xlrd
 from xlrd import open_workbook
-import json, ast
 from utils import UtilClass 
 from ExcelReadClass import *
 
@@ -11,7 +9,7 @@ class ExcelSheetApi():
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
         sheet = wb.sheet_by_index(2)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
 
         ApiHomeDict = {}
 
@@ -39,11 +37,6 @@ class ExcelSheetApi():
 
 
         return ApiHomeDict
-'''for k,v in ApiHomeDict.items():
-    if k=='GetInitialKey':
-        for v1 in v:
-            b= v1.url
-            print b'''
 
 
 #INPUT
@@ -55,7 +48,7 @@ class ExcelSheetInput():
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
         sheet = wb.sheet_by_index(4)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
 
         InputParamDict = {}
         InputDict={}
@@ -88,13 +81,6 @@ class ExcelSheetInput():
 
         return InputDict
 
-'''for k,v in InputDict.items():
-    if k=='GetPreAuthenticationKey':
-        for k1,v1 in v.items():
-            if k1=='jData':
-              for v2 in v1:
-                  b= v2.description
-                  print b'''
 
 #SUCCESS
 
@@ -106,7 +92,7 @@ class ExcelSheetSuccess():
         TempParamDict={}
         sheet = wb.sheet_by_index(5)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
         SuccessParamDict = {}
         SuccessDict = {}
         for rownum in range(rows):
@@ -145,13 +131,13 @@ class ExcelSheetFailure():
         TempParamDict={}
         sheet = wb.sheet_by_index(6)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
 
         FailureParamDict = {}
         FailureDict = {}
         for rownum in range(rows):
             if rownum==0:
-             continue
+                continue
             failureColHash= str(sheet.cell(rownum,0).value).strip()
             apiName= str(sheet.cell(rownum,1).value).strip()
             sno =str(sheet.cell(rownum, 2).value).strip()
@@ -181,7 +167,7 @@ class ExcelSheetJson():
         TempParamDict={}
         sheet = wb.sheet_by_index(7)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
         jsonArrayDict = {}
         JsonDict = {}
         for rownum in range(rows):
@@ -218,7 +204,7 @@ class ExcelSheetLists():
         TempParamDict={}
         sheet = wb.sheet_by_index(8)
         rows=sheet.nrows
-        colmns=sheet.ncols
+        #colmns=sheet.ncols
         ListDict = {}
         ListSourceDict = {}
         for rownum in range(rows):

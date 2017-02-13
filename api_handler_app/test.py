@@ -1,14 +1,30 @@
 from properties.p import Property
 import json
-
-
-output={  u'TotalBSEHoldingValue': u'25200.00',
-    u'TotalYSXHoldingValue': u'0.00',
-    u'TotalNSEHoldingValue': u'28175.30',
-    u'TotalCSEHoldingValue': u'0.00',
-    u'TotalMCXHoldingValue': u'0.00'
+{
+  "stat": "Not_Ok",
+  "Emsg": "Session Expired"
+}
+[
+  {
+    "stat": "Not_Ok",
+    "Emsg": "No Data"
   }
+]
+#ErrorCode  "Incorrect padding"
+dict= {u'stat': u'Not_Ok', u'emsg': u'API ERROR , ErrorCode : Session Expired'}
 
+
+output=[{  u'stat': u'Not_Ok',
+    u'Emsg': u'Session Expired'
+  }]
+
+list=[]
+print output[0].get('Emsg')
+eMsg=output[0].get('Emsg')
+list.append(eMsg)
+print list
+output[0]['Emsg']=list
+print output
 for k,v in output.items():
     print k
     print v
