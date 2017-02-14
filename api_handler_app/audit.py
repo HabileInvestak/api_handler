@@ -55,7 +55,7 @@ class AuditTrial():
     
     
     '''This method will store the response of api for audit purpose'''
-    def api_response_audit(self,requestId,request,apiName,ApiHomeDict):
+    def api_response_audit(self,requestId,request,apiName,ApiHomeDict,userId):
         utilClass=UtilClass()
         logger.info(utilClass.readProperty("ENTERING_METHOD"))
         try:
@@ -74,7 +74,7 @@ class AuditTrial():
                 if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status},
+                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status,utilClass.readProperty('USER_ID'):userId},
                 ) 
             else:          
                 stat= request.get (utilClass.readProperty('STATUS'))
@@ -87,7 +87,7 @@ class AuditTrial():
                 if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status},
+                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status,utilClass.readProperty('USER_ID'):userId},
                     )
             logger.info(utilClass.readProperty("EXITING_METHOD"))
         except Exception as e:

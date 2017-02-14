@@ -66,7 +66,7 @@ class RequestClass():
             key = RSA.importKey(key_pem)
             # cipher = PKCS1_v1_5.new(key)
         except Exception as e:
-            raise e   
+            raise ValueError(self.readProperty("INVALID_TOKEN")) 
         #logger.info(utilClass.readProperty("EXITING_METHOD"))  
         return key
     
@@ -221,7 +221,7 @@ class RequestClass():
         try:
             decoded_data = base64.b64decode(data)
         except Exception as e:
-            raise e       
+            raise ValueError(self.readProperty("INVALID_TOKEN"))      
         #logger.info(utilClass.readProperty("EXITING_METHOD"))  
         return decoded_data
     

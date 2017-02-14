@@ -24,9 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'r9jclw5=vm%vj1$u!2i0oaye2qfz0!q5x*3endb&qu1_x!fod)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 LOGGING = {
@@ -84,16 +84,6 @@ INSTALLED_APPS = (
     'api_handler_app'
 )
 
-class Custom404Middleware(object):
-    def process_exception(self, request, exception):
-        if isinstance(exception, Http404):
-            # implement your custom logic. You can send
-            # http response with any template or message
-            # here. unicode(exception) will give the custom
-            # error message that was passed.
-            msg = unicode(exception)
-            print msg
-            return HttpResponse(msg, status=404)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -104,7 +94,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'api_handler.settings.Custom404Middleware',
+
 )
 
 ROOT_URLCONF = 'api_handler.urls'
