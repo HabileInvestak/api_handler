@@ -27,7 +27,11 @@ JsonDict = j.jsonDict()
 ListDict = l.listDict()
 ListOfDict=[ApiHomeDict,InputDict,SuccessDict,FailureDict,JsonDict,ListDict]
 
+
+'''This class is used to read All excel sheet to return as a list'''
 class ReturnAllDict:
+    
+    '''This method is used to read All excel sheet to return as a list'''
     def returnDict(self):
         print "call Loading dictioanry from excel once deployment"
         return ListOfDict

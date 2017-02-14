@@ -21,8 +21,6 @@ FailureDict = AllList[3]
 JsonDict = AllList[4]
 ListDict = AllList[5]
 
-
-
 logger = logging.getLogger('api_handler_app.views.py')
 
 prop = Property ()
@@ -42,17 +40,15 @@ def get_initial_token(request):
     utilClass=UtilClass()
     ##logger.info(utilClass.readProperty("ENTERING_METHOD"))
     try:
-        ipAddress= request.META.get('REMOTE_ADDR', None)
-        #ipAddress=request.remote_addr #socket.gethostbyname(socket.gethostname())#request.environ.get('REMOTE_ADDR')
-        print 'ipAddress',ipAddress
         if request.method == utilClass.readProperty("METHOD_TYPE"):
             bodyContent = request.body
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("GET_INITIAL_KEY"))[0].url
             apiName = utilClass.readProperty ("GET_INITIAL_KEY")
             authorization = request.META.get(utilClass.readProperty("AUTHORIZATION"))
             userId=""
             '''Store InvestAK request for audit trial purpose'''
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             '''This method will check input availability and input format'''
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -66,7 +62,7 @@ def get_initial_token(request):
                 auditTrial.api_response_audit(requestId, result,apiName,ApiHomeDict)
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response(result)
-            requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,ApiHomeDict)
+            requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             user_id=""
             tomcat_count=""
             jKey=""
@@ -136,12 +132,13 @@ def get_login_mode(request):
     try:
         if request.method == utilClass.readProperty("METHOD_TYPE"):
             bodyContent = request.body
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("LOGIN_MODE"))[0].url
             apiName = utilClass.readProperty ("LOGIN_MODE")
             authorization = request.META.get(utilClass.readProperty("AUTHORIZATION"))
             userId=""
             '''Store InvestAK request for audit trial purpose'''
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             '''This method will check input availability and input format'''
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
@@ -156,7 +153,7 @@ def get_login_mode(request):
                     auditTrial.api_response_audit(requestId, result,apiName,ApiHomeDict)
                     #logger.info(utilClass.readProperty("EXITING_METHOD"))
                     return Response(result)
-            requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,ApiHomeDict)
+            requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             user_id=""
             tomcat_count=""
             jKey=""
@@ -191,6 +188,7 @@ def get_login_2fa(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("LOGIN_2FA"))[0].url
             apiName = utilClass.readProperty ("LOGIN_2FA")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -202,7 +200,7 @@ def get_login_2fa(request):
             jKey = requestObj.get_jkey(public_key3_pem)
             bodyContent = request.body
             logger.debug("userJSON="+bodyContent)
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             logger.debug("requestId before input availability and format="+str(requestId))
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             logger.debug("result="+str(result))
@@ -220,7 +218,7 @@ def get_login_2fa(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
             
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             public_key3=requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
                 jData = requestObj.encrypt(json.dumps(result),public_key3, 2048)
@@ -257,6 +255,7 @@ def get_login(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("GET_PRE_AUTHENTICATION_KEY"))[0].url
             apiName = utilClass.readProperty ("GET_PRE_AUTHENTICATION_KEY")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -266,7 +265,7 @@ def get_login(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.requestObj.get_jkey(public_key3_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -279,7 +278,7 @@ def get_login(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
 
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key3 = requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -316,6 +315,7 @@ def get_default_login(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("DEFAULT_LOGIN"))[0].url
             apiName = utilClass.readProperty ("DEFAULT_LOGIN")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -325,7 +325,7 @@ def get_default_login(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -340,7 +340,7 @@ def get_default_login(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4=requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -379,6 +379,7 @@ def get_valid_pwd(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("VALID_PASSWORD"))[0].url
             apiName = utilClass.readProperty("VALID_PASSWORD")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -388,7 +389,7 @@ def get_valid_pwd(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key3_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -403,7 +404,7 @@ def get_valid_pwd(request):
                 return Response(result)
     
             result = utilClass.PasswordHash(result)
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps (result)
             public_key3=requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -442,6 +443,7 @@ def get_valid_ans(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("VALID_ANSWER"))[0].url
             apiName = utilClass.readProperty ("VALID_ANSWER")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -452,7 +454,7 @@ def get_valid_ans(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key3_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -465,7 +467,7 @@ def get_valid_ans(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key3=requestObj.import_key(public_key3_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -524,6 +526,7 @@ def get_account_info(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("ACCOUNT_INFO"))[0].url
             apiName = utilClass.readProperty ("ACCOUNT_INFO")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -533,7 +536,7 @@ def get_account_info(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -546,7 +549,7 @@ def get_account_info(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4=requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -570,6 +573,7 @@ def get_account_info(request):
         return Response(output)
 
 
+'''This method used to check log in bypass'''
 @api_view(["POST"])
 def get_login_by_pass(request):
     #logger.info(utilClass.readProperty("ENTERING_METHOD"))
@@ -589,6 +593,7 @@ def get_load_retention_type(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("LOAD_RETENSION_TYPE"))[0].url
             apiName = utilClass.readProperty ("LOAD_RETENSION_TYPE")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -598,7 +603,7 @@ def get_load_retention_type(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -611,7 +616,7 @@ def get_load_retention_type(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4=requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -651,6 +656,7 @@ def get_check_crkt_price_range(request):
     apiName=''
     try:  
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("CHECK_CORRECT_PRICE_RANGE"))[0].url
             apiName = utilClass.readProperty ("CHECK_CORRECT_PRICE_RANGE")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -660,7 +666,7 @@ def get_check_crkt_price_range(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -673,7 +679,7 @@ def get_check_crkt_price_range(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -710,6 +716,7 @@ def get_validate_GTD(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("VALIDATE_GTD"))[0].url
             apiName = utilClass.readProperty ("VALIDATE_GTD")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -719,7 +726,7 @@ def get_validate_GTD(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -732,7 +739,7 @@ def get_validate_GTD(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -770,6 +777,7 @@ def get_validate_SLM_price(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("VALIDATE_SLM_PRICE"))[0].url
             apiName = utilClass.readProperty ("VALIDATE_SLM_PRICE")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -779,7 +787,7 @@ def get_validate_SLM_price(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -792,7 +800,7 @@ def get_validate_SLM_price(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -829,6 +837,7 @@ def get_place_order(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("PLACE_ORDER"))[0].url
             apiName = utilClass.readProperty ("PLACE_ORDER")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -838,7 +847,7 @@ def get_place_order(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             print bodyContent
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             print "after result",result 
@@ -853,7 +862,7 @@ def get_place_order(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -889,6 +898,7 @@ def get_order_book(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("ORDER_BOOK"))[0].url
             apiName = utilClass.readProperty ("ORDER_BOOK")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -898,7 +908,7 @@ def get_order_book(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -911,7 +921,7 @@ def get_order_book(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -950,6 +960,7 @@ def get_modify_order(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("MODIFY_ORDER"))[0].url
             apiName = utilClass.readProperty ("MODIFY_ORDER")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -959,7 +970,7 @@ def get_modify_order(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -972,7 +983,7 @@ def get_modify_order(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1008,6 +1019,7 @@ def get_cancel_order(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("CANCEL_ORDER"))[0].url
             apiName = utilClass.readProperty ("CANCEL_ORDER")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1017,7 +1029,7 @@ def get_cancel_order(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1030,7 +1042,7 @@ def get_cancel_order(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1067,6 +1079,7 @@ def get_order_history(request):
     
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("ORDER_HISTORY"))[0].url
             apiName = utilClass.readProperty ("ORDER_HISTORY")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1076,7 +1089,7 @@ def get_order_history(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1089,7 +1102,7 @@ def get_order_history(request):
                 logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1125,6 +1138,7 @@ def get_trade_book(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("TRADE_BOOK"))[0].url
             apiName = utilClass.readProperty ("TRADE_BOOK")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1134,7 +1148,7 @@ def get_trade_book(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1147,7 +1161,7 @@ def get_trade_book(request):
                 logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1184,6 +1198,7 @@ def get_position_book(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("POSITION_BOOK"))[0].url
             apiName = utilClass.readProperty ("POSITION_BOOK")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1193,7 +1208,7 @@ def get_position_book(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1206,7 +1221,7 @@ def get_position_book(request):
                 logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1243,6 +1258,7 @@ def get_holding(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("HOLDING"))[0].url
             apiName = utilClass.readProperty ("HOLDING")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1252,7 +1268,7 @@ def get_holding(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1265,7 +1281,7 @@ def get_holding(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1302,6 +1318,7 @@ def get_limits(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("LIMITS"))[0].url
             apiName = utilClass.readProperty ("LIMITS")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1311,7 +1328,7 @@ def get_limits(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1324,7 +1341,7 @@ def get_limits(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1362,6 +1379,7 @@ def get_check_transaction_password(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("CHECK_TRANSACTION_PASSWORD"))[0].url
             logger.debug("url",url)
             apiName = utilClass.readProperty ("CHECK_TRANSACTION_PASSWORD")
@@ -1372,7 +1390,7 @@ def get_check_transaction_password(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1385,7 +1403,7 @@ def get_check_transaction_password(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1423,7 +1441,7 @@ def get_user_profile(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
-            print "Method type"
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("USER_PROFILE"))[0].url
             apiName = utilClass.readProperty ("USER_PROFILE")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1433,7 +1451,7 @@ def get_user_profile(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1447,7 +1465,7 @@ def get_user_profile(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1486,6 +1504,7 @@ def get_open_orders(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("OPEN_ORDERS"))[0].url
             apiName = utilClass.readProperty ("OPEN_ORDERS")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1495,7 +1514,7 @@ def get_open_orders(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1508,7 +1527,7 @@ def get_open_orders(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1544,6 +1563,7 @@ def get_bo_holdings(request):
     apiName=''
     try:
         if request.method ==utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("BO_HOLDINGS"))[0].url
             apiName = utilClass.readProperty ("BO_HOLDINGS")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1553,7 +1573,7 @@ def get_bo_holdings(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1566,7 +1586,7 @@ def get_bo_holdings(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1603,6 +1623,7 @@ def get_bo_Ul_Trades(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("BO_UI_TRADES"))[0].url
             apiName = utilClass.readProperty ("BO_UI_TRADES")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1612,7 +1633,7 @@ def get_bo_Ul_Trades(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1625,7 +1646,7 @@ def get_bo_Ul_Trades(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):
@@ -1662,6 +1683,7 @@ def get_logout(request):
     apiName=''
     try:
         if request.method == utilClass.readProperty ('METHOD_TYPE'):
+            ipAddress=utilClass.get_client_ip(request)
             url = ApiHomeDict.get(utilClass.readProperty("LOG_OUT"))[0].url
             apiName=utilClass.readProperty("LOG_OUT")
             authorization = request.META.get(utilClass.readProperty('AUTHORIZATION'))
@@ -1671,7 +1693,7 @@ def get_logout(request):
             userId= requestObj.b64_decode(authorization[3].replace("\n",""))
             jKey = requestObj.get_jkey(public_key4_pem)
             bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict)
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,ApiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, ApiHomeDict)
             if utilClass.readProperty("STATUS") in result and result[utilClass.readProperty("STATUS")]==utilClass.readProperty("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,ApiHomeDict)
@@ -1684,7 +1706,7 @@ def get_logout(request):
                 #logger.info(utilClass.readProperty("EXITING_METHOD"))
                 return Response (result)
     
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict)
+            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,ApiHomeDict,ipAddress)
             json_data = json.dumps(result)
             public_key4 = requestObj.import_key(public_key4_pem)
             if(utilClass.readProperty('ALGORITHM_TYPE')=='RSA'):

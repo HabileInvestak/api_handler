@@ -8,8 +8,29 @@ logger = logging.getLogger('api_handler_app.utils.py')
 prop=Property()
 prop_obj = prop.load_property_files('E:\\Investak\\investak.properties')
 
-
+'''This class is used to deal with utility function'''
 class UtilClass():
+    
+    ''' This method is used to fetch client ip address from request'''
+    def get_client_ip(self,request):
+        #logger.info(readProperty("ENTERING_METHOD"))
+        try:
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                print "returning FORWARDED_FOR"
+                ip = x_forwarded_for.split(',')[-1].strip()
+            elif request.META.get('HTTP_X_REAL_IP'):
+                print "returning REAL_IP"
+                ip = request.META.get('HTTP_X_REAL_IP')
+            else:
+                print "returning REMOTE_ADDR"
+                ip = request.META.get('REMOTE_ADDR')
+            #logger.info(readProperty("EXITING_METHOD"))    
+            return ip  
+        
+        except Exception as e:
+            logger.exception(e)
+            raise Exception(e)  
 
 
     ''' This method will read the configuration values from property file'''

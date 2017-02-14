@@ -2,8 +2,10 @@ from xlrd import open_workbook
 from utils import UtilClass 
 from ExcelReadClass import *
 
+'''This class is used to read api excel sheet'''
 class ExcelSheetApi():
 
+    '''This method is used to read api excel sheet'''
     def apiHomeDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
@@ -40,9 +42,10 @@ class ExcelSheetApi():
 
 
 #INPUT
-
+'''This class is used to read input excel sheet'''
 class ExcelSheetInput():
-
+    
+    '''This method is used to read input excel sheet'''
     def inputDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
@@ -83,9 +86,10 @@ class ExcelSheetInput():
 
 
 #SUCCESS
-
+'''This class is used to read success excel sheet'''
 class ExcelSheetSuccess():
-
+    
+    '''This method is used to read success excel sheet'''
     def successDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
@@ -122,9 +126,10 @@ class ExcelSheetSuccess():
 
 
 #FAILURE
-
+'''This class is used to read failure excel sheet'''
 class ExcelSheetFailure():
 
+    '''This method is used to read failure excel sheet dictionary'''
     def failureDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
@@ -158,9 +163,10 @@ class ExcelSheetFailure():
 
 
 #JSON ARRAY
-
+'''This class is used to read jsonArray excel sheet'''
 class ExcelSheetJson():
 
+    '''This method is used to read jsonArray excel sheet'''
     def jsonDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))
@@ -195,9 +201,10 @@ class ExcelSheetJson():
 
 
 #LISTS
-
+'''This class is used to read list excel sheet'''
 class ExcelSheetLists():
 
+    '''This method is used to read list excel sheet'''
     def listDict(self):
         utilClass=UtilClass()
         wb = open_workbook (utilClass.readProperty("API_DICTIONARY_EXCEL"))

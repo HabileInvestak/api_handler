@@ -15,9 +15,11 @@ from Crypto.Cipher import PKCS1_v1_5
 from utils import UtilClass
 
 logger = logging.getLogger('api_handler_app.request.py')
+
+
+'''This class is used to deal with request related'''
 class RequestClass():
 
-    
     '''This method is used to generate key pair'''
     def generate_key_pair(self):
         utilClass=UtilClass()
@@ -238,7 +240,7 @@ class RequestClass():
     
     
     
-    
+    '''This method is used to get tomcat count'''
     def get_tomcat_count(self,tomcat_count):
         # tomcat_count=''
         return tomcat_count    

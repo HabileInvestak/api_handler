@@ -7,10 +7,11 @@ import logging
 
 logger = logging.getLogger('api_handler_app.audit.py')
 
+'''This class will store All the request and response to data base for audit purpose'''
 class AuditTrial():
     
-    '''This method will store the request from InvestAK for audit purpose'''
-    def investak_request_audit(self,userId,bodyContent,apiName,ApiHomeDict):
+    '''This method will store the request and response InvestAK for audit purpose'''
+    def investak_request_audit(self,userId,bodyContent,apiName,ApiHomeDict,ipAddress):
         utilClass=UtilClass()
         #logger.info(utilClass.readProperty("ENTERING_METHOD"))
         requestId=''
@@ -21,7 +22,7 @@ class AuditTrial():
             logger.debug("Logging="+logging)
             if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
                 logger.debug("Investak API audit enable")
-                Auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,apiName=apiName)
+                Auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,apiName=apiName,ipAddress=ipAddress)
                 Auditobj.save()
                 requestId=Auditobj.request_id
                 logger.debug("requestId="+str(requestId))
@@ -32,7 +33,7 @@ class AuditTrial():
     
 
     '''This method will store the request of api for audit purpose'''
-    def api_request_audit(self,requestId,request,apiName,userId,ApiHomeDict):
+    def api_request_audit(self,requestId,request,apiName,userId,ApiHomeDict,ipAddress):
         utilClass=UtilClass()
         #logger.info(utilClass.readProperty("ENTERING_METHOD"))
         try:
@@ -44,7 +45,7 @@ class AuditTrial():
                     defaults={utilClass.readProperty('API_REQUEST'): request,utilClass.readProperty('API_REQUEST_TIME_STAMP'):dateNow,utilClass.readProperty('USER_ID'):userId},
                 )
             else:
-                Auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,apiName=apiName)
+                Auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,apiName=apiName,ipAddress=ipAddress)
                 Auditobj.save ()
                 requestId = Auditobj.request_id   
         except Exception as e:

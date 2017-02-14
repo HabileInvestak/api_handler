@@ -3,7 +3,7 @@ from django.contrib import admin
 from api_handler_app import views
 admin.autodiscover()
 
-
+'''This is a all api name url pattern'''
 urlpatterns = [
    url(r'^admin/', include(admin.site.urls)),
    url(r'^get_initial_token/', views.get_initial_token),

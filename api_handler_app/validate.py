@@ -9,7 +9,7 @@ import time
 
 logger = logging.getLogger('api_handler_app.validate.py')
 
-
+'''This class used to  validate All values'''
 class Validate():
     
     '''This method used to check  mandatory validation'''
@@ -36,6 +36,7 @@ class Validate():
         return errorList
     
     
+    '''This method used to check  string or not'''
     def is_string(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         if Paramvalue:
@@ -43,6 +44,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  character or not'''
     def is_character(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         utilClass=UtilClass()
@@ -57,6 +59,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  number or not'''
     def is_number(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         utilClass=UtilClass()
@@ -71,6 +74,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  decimal or not'''
     def is_decimal(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         utilClass=UtilClass()
@@ -87,6 +91,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  list or not'''
     def is_list(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         utilClass=UtilClass()
@@ -106,6 +111,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  date or not'''
     def is_date_time(self,Paramvalue,param, dataType,validValues,error_message_template,dictVar):
         errorMsg=''
         utilClass=UtilClass()
@@ -122,6 +128,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  url or not'''
     def is_url(self,Paramvalue,param, dataType,validValues,error_message_template):
         errorMsg=''
         utilClass=UtilClass()
@@ -135,6 +142,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  holding api response is json or not'''
     def is_json_dictAndList(self,Paramvalue,param, dataType,JsonDict,validValues):
         utilClass=UtilClass()
         errorMsg=''
@@ -214,6 +222,7 @@ class Validate():
         return errorMsg
     
     
+    '''This method used to check  holding api response is json or not'''
     def is_json_Holding(self,Paramvalue,param, dataType,JsonDict,validValues):
         errorMsg=''
         errorMsgAll=''
@@ -245,7 +254,7 @@ class Validate():
         return errorMsgAll
     
     
-    
+    '''This method used to check json or not'''
     def is_json(self,Paramvalue,param, dataType,JsonDict,validValues):
         errorMsg=''
         utilClass=UtilClass()
@@ -618,7 +627,7 @@ class Validate():
                 logger.debug("errorMsg=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@"+errorMsg)
         return errorMsg
     
-    
+    '''This method used to check ssboetod or not'''
     def is_ssboetod(self,Paramvalue,param, dataType,JsonDict,validValues,error_message_template):
         errorMsg=''
         if Paramvalue:
@@ -899,6 +908,7 @@ class Validate():
         return errorList
 
 
+    '''This method used to check Json valid values validation'''
     def valid_values_validation_JSON(self,validValues,paramValue,param,dataType,validValuePath):
         utilClass=UtilClass()
         logger.info(utilClass.readProperty("ENTERING_METHOD"))
@@ -934,6 +944,8 @@ class Validate():
             raise e
         logger.info(utilClass.readProperty("EXITING_METHOD"))    
         return errorMsg
+    
+    
     '''This method used to check validation and manipulation of the data'''
     def validation_and_manipulation(self,jsonObject,apiName,dictVar):
         utilClass=UtilClass()
