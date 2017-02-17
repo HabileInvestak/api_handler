@@ -2,7 +2,7 @@
 class ApiClass(object):
 
     '''This method is used to initialize api excel sheet'''
-    def __init__(self, hashApi, source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseEncryption,notes,inputSample):
+    def __init__(self, hashApi, source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseEncryption,notes,inputSample,inputValidation,responseValidation):
         self.hashApi = hashApi
         self.source = source
         self.subject = subject
@@ -17,6 +17,8 @@ class ApiClass(object):
         self.resonseEncryption = resonseEncryption
         self.notes = notes
         self.inputSample = inputSample
+        self.inputValidation = inputValidation
+        self.responseValidation = responseValidation
 
 
 '''This class is used to initialize input excel sheet'''

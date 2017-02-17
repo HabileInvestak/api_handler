@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name='Audit',
             fields=[
                 ('user_id', models.TextField()),
-                ('apiName', models.TextField()),
+                ('api_name', models.TextField()),
                 ('request_id', models.AutoField(unique=True, serialize=False, primary_key=True)),
                 ('investak_request_time_stamp', models.DateTimeField(null=True)),
                 ('api_request_time_stamp', models.DateTimeField(null=True)),
@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('api_response', models.TextField()),
                 ('api_status', models.TextField()),
                 ('tso_status', models.TextField()),
-                ('ipAddress', models.TextField()),
+                ('ip_address', models.TextField()),
             ],
             options={
                 'ordering': ('request_id',),

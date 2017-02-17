@@ -1,147 +1,145 @@
-from properties.p import Property
-
-import logging
-import json
 import hashlib
+import json
+import logging
+
+from properties.p import Property
 
 
 logger = logging.getLogger('api_handler_app.utils.py')
 prop=Property()
-prop_obj = prop.load_property_files('E:\\Investak\\investak.properties')
+#propObj = prop.load_property_files('D:\\InvestAK\\26-12-2016\\investak.properties')  #hari
+propObj = prop.load_property_files('E:\\Investak\\investak.properties')
 
 '''This class is used to deal with utility function'''
 class UtilClass():
     
     ''' This method is used to fetch client ip address from request'''
     def get_client_ip(self,request):
-        #logger.info(readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         try:
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded_for:
+            xForwardedFor = request.META.get('HTTP_X_FORWARDED_FOR')
+            if xForwardedFor:
                 print "returning FORWARDED_FOR"
-                ip = x_forwarded_for.split(',')[-1].strip()
+                ip = xForwardedFor.split(',')[-1].strip()
             elif request.META.get('HTTP_X_REAL_IP'):
                 print "returning REAL_IP"
                 ip = request.META.get('HTTP_X_REAL_IP')
             else:
                 print "returning REMOTE_ADDR"
-                ip = request.META.get('REMOTE_ADDR')
-            #logger.info(readProperty("EXITING_METHOD"))    
-            return ip  
+                ip = request.META.get('REMOTE_ADDR') 
+        except Exception as exception:
+            logger.exception(exception)
+            raise Exception(exception)
+        logger.info(self.read_property("EXITING_METHOD"))   
+        return ip  
         
-        except Exception as e:
-            logger.exception(e)
-            raise Exception(e)  
-
 
     ''' This method will read the configuration values from property file'''
-    def readProperty(self,name):
-        #logger.info(readProperty("ENTERING_METHOD"))
+    def read_property(self,name):
         try:
-            data=prop_obj.get(name)
-            #logger.info(readProperty("EXITING_METHOD"))
+            data=propObj.get(name)
             return data
-        except Exception as e:
-            logger.exception(e)
-            raise Exception(e)        
+        except Exception as exception:
+            logger.exception(exception)
+            raise Exception(exception)        
 
 
     '''This method is used to create PasswordHash'''
-    def PasswordHash(self,jsonObject):
+    def password_hash(self,jsonObject):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))        
+        logger.info(self.read_property("ENTERING_METHOD"))        
         data={}
         try:
             for key in jsonObject:
                 value = jsonObject[key]
-                if key == self.readProperty ('PASSWORD'):
-                    value = self.password_hash (value)
+                if key == self.read_property ('PASSWORD'):
+                    value = self.password_hash_value (value)
                 data[key] = value
-        except Exception as e:
-            raise e        
-        logger.info(self.readProperty("EXITING_METHOD"))      
+        except Exception as exception:
+            raise exception        
+        logger.info(self.read_property("EXITING_METHOD"))      
         return data
 
 
     '''This method will check whether the given input is in JSON format or not'''
-    def checkJson(self,text):
+    def check_json(self,text):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         result = False
         try:
             json.loads(text)
             result = True 
         except Exception:
             result = False
-        logger.info(self.readProperty("EXITING_METHOD"))  
+        logger.info(self.read_property("EXITING_METHOD"))  
         return result
 
     
     '''This method will check whether the given string is not Blank or Blank'''
-    def isNotBlank(self,myString):
+    def is_not_blank(self,myString):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         try:
             if myString and (part.strip() for part in myString):
                 # myString is not None AND myString is not empty or blank
-                logger.info(self.readProperty("EXITING_METHOD"))  
+                logger.info(self.read_property("EXITING_METHOD"))  
                 return True
             # myString is None OR myString is empty or blank
-        except Exception as e:
-            raise e    
-        logger.info(self.readProperty("EXITING_METHOD"))  
+        except Exception as exception:
+            raise exception    
+        logger.info(self.read_property("EXITING_METHOD"))  
         return False
 
     
     '''This method will check whether the given string is Blank or not'''
-    def isBlank(self,myString):
+    def is_blank(self,myString):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         try:
             if myString and (part.strip() for part in myString):
                 # myString is not None AND myString is not empty or blank
-                logger.info(self.readProperty("EXITING_METHOD"))  
+                logger.info(self.read_property("EXITING_METHOD"))  
                 return False
                 # myString is None OR myString is empty or blank
-        except Exception as e:
-            raise e   
-        logger.info(self.readProperty("EXITING_METHOD"))  
+        except Exception as exception:
+            raise exception   
+        logger.info(self.read_property("EXITING_METHOD"))  
         return True
 
     
     '''This method is used to replace a data'''
-    def replace_text(self,orginal_data, old_text, new_text):
+    def replace_text(self,orginalData, oldText, newText):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))        
+        logger.info(self.read_property("ENTERING_METHOD"))        
         try:
-            orginal_data = orginal_data.replace(old_text, new_text)
-        except Exception as e:
-            raise e   
-        logger.info(self.readProperty("EXITING_METHOD"))  
-        return orginal_data
+            orginalData = orginalData.replace(oldText, newText)
+        except Exception as exception:
+            raise exception   
+        logger.info(self.read_property("EXITING_METHOD"))  
+        return orginalData
     
     
     '''This method is used to add data'''
-    def append_data(self,original_text, append_text):
+    def append_data(self,originalText, appendText):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         try:
-            original_text = original_text + append_text
-        except Exception as e:
-            raise e   
-        logger.info(self.readProperty("EXITING_METHOD"))  
-        return original_text
+            originalText = originalText + appendText
+        except Exception as exception:
+            raise exception   
+        logger.info(self.read_property("EXITING_METHOD"))  
+        return originalText
 
     
     '''This method is used to create PasswordHash'''
-    def password_hash(self,password):
+    def password_hash_value(self,password):
         
-        logger.info(self.readProperty("ENTERING_METHOD"))
+        logger.info(self.read_property("ENTERING_METHOD"))
         try:
             for num in range(0, 999):
                 password = hashlib.sha256(password).digest()
-            password_hash = hashlib.sha256(password).hexdigest()
-        except Exception as e:
-            raise e   
-        logger.info(self.readProperty("EXITING_METHOD"))
-        return password_hash
+            passwordHash = hashlib.sha256(password).hexdigest()
+        except Exception as exception:
+            raise exception   
+        logger.info(self.read_property("EXITING_METHOD"))
+        return passwordHash

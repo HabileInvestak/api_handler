@@ -1,9 +1,9 @@
-from utils import UtilClass
 from datetime import datetime
+import logging
 
 from api_handler_app.models import Audit
+from utils import UtilClass
 
-import logging
 
 logger = logging.getLogger('api_handler_app.audit.py')
 
@@ -11,132 +11,132 @@ logger = logging.getLogger('api_handler_app.audit.py')
 class AuditTrial():
     
     '''This method will store the request and response InvestAK for audit purpose'''
-    def investak_request_audit(self,userId,bodyContent,apiName,ApiHomeDict,ipAddress):
+    def investak_request_audit(self,userId,bodyContent,apiName,apiHomeDict,ipAddress):
         utilClass=UtilClass()
-        #logger.info(utilClass.readProperty("ENTERING_METHOD"))
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
         requestId=''
         try:
             dateNow = datetime.now ()
-            logging = ApiHomeDict.get(apiName)[0].logging
+            logging = apiHomeDict.get(apiName)[0].logging
             logger.debug("Before Investak API audit enable")
             logger.debug("Logging="+logging)
-            if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
+            if (logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                 logger.debug("Investak API audit enable")
-                Auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,apiName=apiName,ipAddress=ipAddress)
-                Auditobj.save()
-                requestId=Auditobj.request_id
+                auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress)
+                auditobj.save()
+                requestId=auditobj.request_id
                 logger.debug("requestId="+str(requestId))
-        except Exception as e:
-            raise e
-        #logger.info(utilClass.readProperty("EXITING_METHOD"))
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))
         return requestId
     
 
     '''This method will store the request of api for audit purpose'''
-    def api_request_audit(self,requestId,request,apiName,userId,ApiHomeDict,ipAddress):
+    def api_request_audit(self,requestId,request,apiName,userId,apiHomeDict,ipAddress):
         utilClass=UtilClass()
-        #logger.info(utilClass.readProperty("ENTERING_METHOD"))
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
         try:
             dateNow = datetime.now ()
-            logging=ApiHomeDict.get(apiName)[0].logging
-            if(logging==utilClass.readProperty("YES") and utilClass.readProperty('API_TSO_AUDIT_ENABLE')==utilClass.readProperty("YES") and utilClass.readProperty('INVESTAK_API_AUDIT_ENABLE')==utilClass.readProperty("YES")):
+            logging=apiHomeDict.get(apiName)[0].logging
+            if(logging==utilClass.read_property("YES") and utilClass.read_property('API_TSO_AUDIT_ENABLE')==utilClass.read_property("YES") and utilClass.read_property('INVESTAK_API_AUDIT_ENABLE')==utilClass.read_property("YES")):
                 Audit.objects.update_or_create (
                     request_id=requestId,
-                    defaults={utilClass.readProperty('API_REQUEST'): request,utilClass.readProperty('API_REQUEST_TIME_STAMP'):dateNow,utilClass.readProperty('USER_ID'):userId},
+                    defaults={utilClass.read_property('API_REQUEST'): request,utilClass.read_property('API_REQUEST_TIME_STAMP'):dateNow,utilClass.read_property('USER_ID'):userId},
                 )
             else:
-                Auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,apiName=apiName,ipAddress=ipAddress)
-                Auditobj.save ()
-                requestId = Auditobj.request_id   
-        except Exception as e:
-            raise e
-        #logger.info(utilClass.readProperty("EXITING_METHOD"))
+                auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress)
+                auditobj.save ()
+                requestId = auditobj.request_id   
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))
         return requestId
     
     
     '''This method will store the response of api for audit purpose'''
-    def api_response_audit(self,requestId,request,apiName,ApiHomeDict,userId):
+    def api_response_audit(self,requestId,request,apiName,apiHomeDict,userId):
         utilClass=UtilClass()
-        logger.info(utilClass.readProperty("ENTERING_METHOD"))
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
         try:
             dateNow = datetime.now ()
-            logging = ApiHomeDict.get(apiName)[0].logging
+            logging = apiHomeDict.get(apiName)[0].logging
             if type(request) is list:
                 for dict_var in request:
                     print dict_var
-                    stat=dict_var.get(utilClass.readProperty('STATUS'))
-                    if stat == utilClass.readProperty ('OK'):
-                        api_status = utilClass.readProperty('SUCCESS')
+                    stat=dict_var.get(utilClass.read_property('STATUS'))
+                    if stat == utilClass.read_property ('OK'):
+                        apiStatus = utilClass.read_property('SUCCESS')
                         pass
                     else:
-                        api_status = utilClass.readProperty('FAILURE')
+                        apiStatus = utilClass.read_property('FAILURE')
                         break
-                if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
+                if (logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status,utilClass.readProperty('USER_ID'):userId},
+                        defaults={utilClass.read_property('API_RESPONSE'): request,utilClass.read_property('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('API_STATUS'):apiStatus,utilClass.read_property('USER_ID'):userId},
                 ) 
             else:          
-                stat= request.get (utilClass.readProperty('STATUS'))
-                if stat== utilClass.readProperty ('OK'):
-                    api_status=utilClass.readProperty ('SUCCESS')
-                elif stat == utilClass.readProperty ('NOT_OK'):
-                    api_status = utilClass.readProperty ('FAILURE')
+                stat= request.get (utilClass.read_property('STATUS'))
+                if stat== utilClass.read_property ('OK'):
+                    apiStatus=utilClass.read_property ('SUCCESS')
+                elif stat == utilClass.read_property ('NOT_OK'):
+                    apiStatus = utilClass.read_property ('FAILURE')
                 else:
-                    api_status = utilClass.readProperty ('SUCCESS')
-                if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('INVESTAK_API_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
+                    apiStatus = utilClass.read_property ('SUCCESS')
+                if (logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('API_RESPONSE'): request,utilClass.readProperty('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('API_STATUS'):api_status,utilClass.readProperty('USER_ID'):userId},
+                        defaults={utilClass.read_property('API_RESPONSE'): request,utilClass.read_property('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('API_STATUS'):apiStatus,utilClass.read_property('USER_ID'):userId},
                     )
-            logger.info(utilClass.readProperty("EXITING_METHOD"))
-        except Exception as e:
-            raise e
+            logger.info(utilClass.read_property("EXITING_METHOD"))
+        except Exception as exception:
+            raise exception
     
     
     '''This method will store the response of tso for audit purpose'''
-    def tso_response_audit(self,requestId,request,apiName,ApiHomeDict,SuccessDict,FailureDict):
+    def tso_response_audit(self,requestId,request,apiName,apiHomeDict,successDict,failureDict):
         utilClass=UtilClass()
-        logger.info(utilClass.readProperty("ENTERING_METHOD"))
-        tso_status=''
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
+        tsoStatus=''
         dictionary={}
         try:
             dateNow = datetime.now ()
             #find json array
-            logging = ApiHomeDict.get(apiName)[0].logging
+            logging = apiHomeDict.get(apiName)[0].logging
             if type(request) is list:
                 for dict_var in request:
-                    stat=dict_var.get(utilClass.readProperty('STATUS'))
-                    if stat == utilClass.readProperty ('OK'):
-                        tso_status = utilClass.readProperty('SUCCESS')
+                    stat=dict_var.get(utilClass.read_property('STATUS'))
+                    if stat == utilClass.read_property ('OK'):
+                        tsoStatus = utilClass.read_property('SUCCESS')
                         pass
                     else:
-                        tso_status = utilClass.readProperty('FAILURE')
+                        tsoStatus = utilClass.read_property('FAILURE')
                         break
-                if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('API_TSO_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
+                if (logging == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('TSO_RESPONSE'): request,utilClass.readProperty('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('TSO_STATUS'):tso_status},
+                        defaults={utilClass.read_property('TSO_RESPONSE'): request,utilClass.read_property('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TSO_STATUS'):tsoStatus},
                 )    
             else:
-                stat = request.get(utilClass.readProperty('STATUS'))
-                if stat == utilClass.readProperty ('OK'):
-                    tso_status = utilClass.readProperty('SUCCESS')
-                    dictionary=SuccessDict
-                elif stat == utilClass.readProperty ('NOT_OK'):
-                    tso_status = utilClass.readProperty('FAILURE')
-                    dictionary=FailureDict
+                stat = request.get(utilClass.read_property('STATUS'))
+                if stat == utilClass.read_property ('OK'):
+                    tsoStatus = utilClass.read_property('SUCCESS')
+                    dictionary=successDict
+                elif stat == utilClass.read_property ('NOT_OK'):
+                    tsoStatus = utilClass.read_property('FAILURE')
+                    dictionary=failureDict
                 else:
-                    tso_status=utilClass.readProperty('SUCCESS')
-                    dictionary=SuccessDict
+                    tsoStatus=utilClass.read_property('SUCCESS')
+                    dictionary=successDict
                 logger.debug(apiName)
-                logging = ApiHomeDict.get(apiName)[0].logging
-                if (logging == utilClass.readProperty ("YES") and utilClass.readProperty ('API_TSO_AUDIT_ENABLE') == utilClass.readProperty ("YES")):
+                logging = apiHomeDict.get(apiName)[0].logging
+                if (logging == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.readProperty('TSO_RESPONSE'): request,utilClass.readProperty('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.readProperty('TSO_STATUS'):tso_status},
+                        defaults={utilClass.read_property('TSO_RESPONSE'): request,utilClass.read_property('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TSO_STATUS'):tsoStatus},
                     )
-        except Exception as e:
-            raise e
-        logger.info(utilClass.readProperty("EXITING_METHOD"))
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))
         return dictionary

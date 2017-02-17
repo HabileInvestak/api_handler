@@ -1,12 +1,12 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from api_handler_app import views
+
 from django.conf.urls import handler404
 from django.conf.urls import handler500
 
 handler404 = 'api_handler_app.views.page_not_found'
 handler500 = 'api_handler_app.views.server_error'
-
 
 admin.autodiscover()
 

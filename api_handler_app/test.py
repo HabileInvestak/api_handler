@@ -1,4 +1,98 @@
 from properties.p import Property
+import datetime
+
+import time
+paramValue='DAY1'
+words=['NET1', ' DAY1', ' DAYNET']
+if str(paramValue) in words:
+    check = 0
+    print 'ok'
+
+'''
+#date Time normal
+date_text='16/02/2017 12:31:24'
+
+try:
+    time.strptime(date_text,'%d/%m/%Y %H:%M:%S')
+    Date = True
+except ValueError:
+    Date = False
+    Date = False
+print 'ok'
+'''
+'''
+#date Time month abbreviation
+date_text='16-Feb-2017 10:30:33'
+
+try:
+    time.strptime(date_text,'%d-%b-%Y %H:%M:%S')
+    Date = True
+except ValueError:
+    Date = False
+print 'ok'
+'''
+#date  month abbreviation
+date_text='16-Feb-2017'
+if '-' in date_text:
+    try:
+        time.strptime(date_text,'%d-%b-%Y')
+        Date = True
+    except ValueError:
+        Date = False
+    print 'ok hyphen'
+    
+date_text='16/02/2017'
+if '/' in date_text:
+    #date normal 
+    try:
+        time.strptime(date_text,'%d/%m/%Y')
+        Date = True
+    except ValueError:
+        Date = False
+    print 'ok slash'
+
+
+#Time normal
+date_text='10:30:33'
+
+try:
+    time.strptime(date_text,'%H:%M:%S')
+    Date = True
+except ValueError:
+    Date = False
+print 'ok'
+
+
+#--
+# First make a datetime.datetime from 1985-02-17T06:00.
+#--
+
+'''dt = datetime.datetime ( 1985, 2, 17, 6 )
+print "Input datetime:", dt
+
+#--
+# Convert to Julian Date and display.
+#--
+
+jd = JulianDate.fromDatetime(dt)
+print float(jd)
+
+#--
+# Convert back to a datetime object and display that.
+#--
+
+check = jd.datetime()
+print "Check datetime:", check
+'''
+
+'''date_object=datetime.strptime("8192009","%m%d%Y")
+print date_object
+#datetime.datetime(2009, 8, 19, 0, 0)
+'''
+
+
+
+
 import json
 {
   "stat": "Not_Ok",
