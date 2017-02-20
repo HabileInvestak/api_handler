@@ -7,10 +7,12 @@ from utils import UtilClass
 
 logger = logging.getLogger('api_handler_app.audit.py')
 
-'''This class will store All the request and response to data base for audit purpose'''
+'''This class will store All the request and response to database for audit purpose.
+we will store investak request,api request,tso response and api response and its status with timestamp'''
 class AuditTrial():
     
-    '''This method will store the request and response InvestAK for audit purpose'''
+    '''This method will store the request of Investak to database
+    and it create request id which has unique id for the apiName when investak_api audit enable is Yes'''
     def investak_request_audit(self,userId,bodyContent,apiName,apiHomeDict,ipAddress):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -32,7 +34,8 @@ class AuditTrial():
         return requestId
     
 
-    '''This method will store the request of api for audit purpose'''
+    '''This method will store the request of api to database
+    and it create request id which has unique id for the apiName when investak_api audit enable is Yes and api_tso audit enable yes'''
     def api_request_audit(self,requestId,request,apiName,userId,apiHomeDict,ipAddress):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -54,7 +57,8 @@ class AuditTrial():
         return requestId
     
     
-    '''This method will store the response of api for audit purpose'''
+    '''This method will store the response of api to database
+    and check whether the response is list or dictionary and corresponding status is noted'''
     def api_response_audit(self,requestId,request,apiName,apiHomeDict,userId):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -94,7 +98,8 @@ class AuditTrial():
             raise exception
     
     
-    '''This method will store the response of tso for audit purpose'''
+    '''This method will store the response of tso to store database
+    and check whether the response is list or dictionary and corresponding status is noted'''
     def tso_response_audit(self,requestId,request,apiName,apiHomeDict,successDict,failureDict):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))

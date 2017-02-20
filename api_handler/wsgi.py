@@ -16,6 +16,9 @@ from api_handler_app.excel_sheet import *#ExcelSheetApi,ExcelSheetInput,ExcelShe
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "api_handler.settings")
 application = get_wsgi_application()
+
+'''This is used to read All excel sheet to store as a list
+we will use this list which contains all excel sheets for validation when apiName is call'''
 a = ExcelSheetApi()
 i = ExcelSheetInput()
 s = ExcelSheetSuccess()
@@ -32,11 +35,12 @@ listOfDict=[apiHomeDict,inputDict,successDict,failureDict,jsonDict,listDict]
 print "call Loading dictioanry from excel once deployment"
 
 
-
-'''This class is used to read All excel sheet to return as a list'''
+'''This class is used to read All excel sheet to return as a list.
+we will use this list which contains all excel sheets for validation when apiName is call'''
 class ReturnAllDict:
     
-    '''This method is used to read All excel sheet to return as a list'''
+    '''This method is used to read All excel sheet to return as a list
+    we will use this list which contains all excel sheets for validation when apiName is call'''
     def return_dict(self):
         print "call Loading dictioanry from excel once deployment"
         return listOfDict

@@ -29,7 +29,8 @@ prop = Property ()
 propObj = prop.load_property_files ('E:\\Investak\\investak.properties')  # ranjith
 
 
-'''Provides you with initial token for Login '''
+'''Provides you with initial token for Login,it will call two api name for create initial token and it will check input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and 
+check input encryption,response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_initial_token(request):
     auditTrial=AuditTrial()
@@ -119,7 +120,8 @@ def get_initial_token(request):
         return Response(output)
     
     
-'''Get login mode'''
+'''Get login mode and it will check input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and 
+check input encryption,response decryption ,rsa algorithm'''
 @api_view(["POST"])    
 def get_login_mode(request):
     auditTrial=AuditTrial()
@@ -175,7 +177,9 @@ def get_login_mode(request):
         return Response(output)        
 
 
-'''First step in login'''
+'''First step in login and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_login_2fa(request):
     utilClass=UtilClass()
@@ -248,7 +252,9 @@ def get_login_2fa(request):
         return Response(output)
 
 
-'''Provide you with pre-authentication key for encryption'''
+'''Provide you with pre-authentication key for encryption and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_login(request):
 
@@ -315,7 +321,9 @@ def get_login(request):
         return Response(output)
 
    
-'''Gives you information about client enabled data'''
+'''Gives you information about client enabled data and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_default_login(request):
     utilClass=UtilClass()
@@ -385,7 +393,9 @@ def get_default_login(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
     
-'''Authenticates the user with password'''
+'''Authenticates the user with password and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_valid_pwd(request):
     utilClass=UtilClass()
@@ -455,7 +465,9 @@ def get_valid_pwd(request):
         return Response(output)    
 
 
-'''Authenticates the answers in 2FA Q&A mode'''
+'''Authenticates the answers in 2FA Q&A mode and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_valid_ans(request):
     utilClass=UtilClass()
@@ -545,7 +557,9 @@ def get_valid_ans(request):
         return Response(output)
 
 
-'''Provides you with account details'''
+'''Provides you with account details and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_account_info(request):
     utilClass=UtilClass()
@@ -620,7 +634,9 @@ def get_login_by_pass(request):
     logger.info(utilClass.read_property("EXITING_METHOD"))
     return ''
 
-'''Gives retention types for the particular exchange'''
+'''Gives retention types for the particular exchange and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_load_retention_type(request):
     utilClass=UtilClass()
@@ -690,7 +706,9 @@ def get_load_retention_type(request):
         return Response(output)
 
 
-'''Check circuit limt for the order price'''
+'''Check circuit limt for the order price and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_check_crkt_price_range(request):
     utilClass=UtilClass()
@@ -756,7 +774,9 @@ def get_check_crkt_price_range(request):
         return Response(output)
 
 
-'''GTD validations are done if retention is selected '''
+'''GTD validations are done if retention is selected and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_validate_GTD(request):
     utilClass=UtilClass()
@@ -823,7 +843,9 @@ def get_validate_GTD(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)    
 
-'''Validates Stop loss price'''
+'''Validates Stop loss price and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_validate_SLM_price(request):
     utilClass=UtilClass()
@@ -889,7 +911,9 @@ def get_validate_SLM_price(request):
         return Response(output)
 
 
-'''Allows you to place order for selected scrip'''
+'''Allows you to place order for selected scrip and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_place_order(request):
     utilClass=UtilClass()
@@ -956,7 +980,9 @@ def get_place_order(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
 
-'''Allows you to view the placed orders and their status'''
+'''Allows you to view the placed orders and their status and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_order_book(request):
     utilClass=UtilClass()
@@ -1024,7 +1050,9 @@ def get_order_book(request):
         return Response(output)
 
 
-'''Allows you to modify open orders'''
+'''Allows you to modify open orders and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_modify_order(request):
     utilClass=UtilClass()
@@ -1089,7 +1117,9 @@ def get_modify_order(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output) 
 
-'''Allows you to cancel an open order'''
+'''Allows you to cancel an open order and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_cancel_order(request):
     utilClass=UtilClass()
@@ -1154,7 +1184,9 @@ def get_cancel_order(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
 
-'''Allows you to view the order history for the Order.'''
+'''Allows you to view the order history for the Order and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_order_history(request):
     utilClass=UtilClass()
@@ -1219,7 +1251,9 @@ def get_order_history(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
 
-'''Allows you to view trade details'''
+'''Allows you to view trade details and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_trade_book(request):
     utilClass=UtilClass()
@@ -1286,7 +1320,9 @@ def get_trade_book(request):
         return Response(output)
 
 
-'''Allows you to view position book details'''   
+'''Allows you to view position book details and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''   
 @api_view(["POST"])
 def get_position_book(request):
     utilClass=UtilClass()
@@ -1352,7 +1388,9 @@ def get_position_book(request):
         return Response(output)
 
 
-'''This Allows user to view the holdings'''
+'''This Allows user to view the holdings and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_holding(request):
     utilClass=UtilClass()
@@ -1418,7 +1456,9 @@ def get_holding(request):
         return Response(output)
 
 
-'''Allows you to view segment w ise RMS limits'''
+'''Allows you to view segment wise RMS limits and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_limits(request):
     utilClass=UtilClass()
@@ -1485,7 +1525,9 @@ def get_limits(request):
         return Response(output)
 
 
-'''Allows you to view segment w ise RMS limits'''
+'''Allows you to view segment wise RMS limits and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_check_transaction_password(request):
     utilClass=UtilClass()
@@ -1553,7 +1595,9 @@ def get_check_transaction_password(request):
         return Response(output)
 
 
-'''Provides you w ith user details'''
+'''Provides you w ith user details and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_user_profile(request):
     utilClass=UtilClass()
@@ -1622,7 +1666,9 @@ def get_user_profile(request):
 
 
 
-'''Loads open order to set alerts based on trade.'''
+'''Loads open order to set alerts based on trade and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_open_orders(request):
     utilClass=UtilClass()
@@ -1687,7 +1733,9 @@ def get_open_orders(request):
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
     
-'''List of End of the Day holdings for clients'''
+'''List of End of the Day holdings for clients and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_bo_holdings(request):
     utilClass=UtilClass()
@@ -1753,7 +1801,9 @@ def get_bo_holdings(request):
         return Response(output)
 
 
-'''List of End of the day underlying Trades for holdings for the clients'''
+'''List of End of the day underlying Trades for holdings for the clients and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_bo_Ul_Trades(request):
     utilClass=UtilClass()
@@ -1819,7 +1869,9 @@ def get_bo_Ul_Trades(request):
         return Response(output)
 
 
-'''Allows you to logout from the application'''
+'''This method allows you to logout from the application and it will check authorization token,
+input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
+response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_logout(request):
     utilClass=UtilClass()
@@ -1885,7 +1937,7 @@ def get_logout(request):
         return Response(output)
     
     
-''' This method is used to create invalid url response'''
+''' This method is used to create invalid url response when page is not found error is occur'''
 def page_not_found(request):
     utilClass=UtilClass()
     logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1900,7 +1952,7 @@ def page_not_found(request):
         raise Exception(exception)      
     
      
-''' This method is used to create server error response'''
+''' This method is used to create server error response when server error is occur'''
 def server_error(request):
     utilClass=UtilClass()
     logger.info(utilClass.read_property("ENTERING_METHOD"))

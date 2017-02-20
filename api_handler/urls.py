@@ -11,6 +11,7 @@ handler500 = 'api_handler_app.views.server_error'
 admin.autodiscover()
 
 '''This is a all api name url pattern'''
+'''This Url used to call corresponding apiName method in views.py'''
 urlpatterns = [
    url(r'^admin/', include(admin.site.urls)),
    url(r'^get_initial_token/', views.get_initial_token),

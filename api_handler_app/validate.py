@@ -10,10 +10,10 @@ from utils import UtilClass
 
 logger = logging.getLogger('api_handler_app.validate.py')
 
-'''This class used to  validate All values'''
+'''This class used to  validation and manipulation of All api Values'''
 class Validate():
     
-    '''This method used to check  mandatory validation'''
+    '''This method used to check parameter value is mandatory or not.if mandatory paramter value is empty or null error message is added to error list'''
     def optional_validation(self,optional, paramValue, param):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -37,7 +37,7 @@ class Validate():
         return errorList
     
     
-    '''This method used to check  string or not'''
+    '''This method used to check parameter value is string or not'''
     def is_string(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -51,7 +51,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  character or not'''
+    '''This method used to check parameter value is character or not if non character error message is added to error list'''
     def is_character(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -71,7 +71,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  number or not'''
+    '''This method used to check  parameter value is number or not, if non a number error message is added to error list'''
     def is_number(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -91,7 +91,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  decimal or not'''
+    '''This method used to check  decimal or not, if non a decimal error message is added to error list'''
     def is_decimal(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -115,7 +115,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  list or not'''
+    '''This method used to check response is list or not,if non a list, error message is added to error list'''
     def is_list(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -140,7 +140,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  date time or not'''
+    '''This method used to check parameter value is date time or not,if non a date time, error message is added to error list'''
     def is_date_time(self,paramValue,param, dataType,validValues,errorMessageTemplate,dictVar):
         errorMsg=''
         utilClass=UtilClass()
@@ -172,7 +172,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  date or not'''
+    '''This method used to check parameter value is date or not,if non a date error message is added to error list'''
     def is_date(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -192,7 +192,7 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  time or not'''
+    '''This method used to check parameter value is time or not,if non a time, error message is added to error list'''
     def is_time(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -211,7 +211,7 @@ class Validate():
         logger.info(utilClass.read_property("EXITING_METHOD"))     
         return errorMsg
     
-    '''This method used to check  url or not'''
+    '''This method used to check parameter value is Url or not,if non a Url, error message is added to error list'''
     def is_url(self,paramValue,param, dataType,validValues,errorMessageTemplate):
         errorMsg=''
         utilClass=UtilClass()
@@ -230,7 +230,8 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  holding api response is json or not'''
+    '''This method used to check  holding apiName response is Json or not,if Json,it will check Json array sheet datatype,valid values validation,
+    if error in data type,valid values validation error  message is added to error list'''
     def is_json_dictAndList(self,paramValue,param, dataType,jsonDict,validValues):
         utilClass=UtilClass()
         errorMsg=''
@@ -312,7 +313,8 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check  holding api response is json or not'''
+    '''This method used to check  holding api response is json or not,and it is check it is a list and dictionary response.
+    if list it give one by one response to check json validation method call.if error message occur it is added to error list'''
     def is_json_Holding(self,paramValue,param, dataType,jsonDict,validValues):
         errorMsg=''
         errorMsgAll=''
@@ -348,7 +350,8 @@ class Validate():
         return errorMsgAll
     
     
-    '''This method used to check json or not'''
+    '''This method used to check json or not,if Json,it will check Json array sheet all datatype,valid values validation,it will check multiple list and dictionary response
+    if error in data type,valid values validation error  message is added to error list'''
     def is_json(self,paramValue,param, dataType,jsonDict,validValues):
         errorMsg=''
         utilClass=UtilClass()
@@ -739,7 +742,8 @@ class Validate():
         return errorMsg
         
                             
-    '''This method used to check all data type validation'''
+    '''This method used to check all data type validation and forward to corresponding data type validation method,
+    if error message occur,it is added to error list'''
     def data_type_validation(self,dataType,paramValue,param,validValues,ApiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -786,7 +790,7 @@ class Validate():
         return errorList
     
     
-    '''This method used to check url type validation'''
+    '''This method used to check url type validation,if not url it return false'''
     def exist_Url(self,path):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -800,7 +804,7 @@ class Validate():
         return returnValue
     
     
-    '''This method used to validate date time format for Input Request'''
+    '''This method used to validate date time format for Input Request,if not date time in input response it return false'''
     def validate_date_time_input(self,dateText):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -813,7 +817,7 @@ class Validate():
         return date
     
     
-    '''This method used to validate date time format for success response'''
+    '''This method used to validate date time format for success response,if not date time in success response it return false'''
     def validate_date_time_success(self,dateText):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -836,7 +840,7 @@ class Validate():
         return date
     
     
-    '''This method used to validate date format'''
+    '''This method used to validate date format for success response,if not date time in success response it return false'''
     def validate_date(self,dateText):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -859,7 +863,7 @@ class Validate():
         return date
    
    
-    '''This method used to validate time format'''
+    '''This method used to validate time format for success response,if not time in success response it return false'''
     def validate_time(self,dateText):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -872,7 +876,8 @@ class Validate():
         return date
     
     
-    '''This method will check the input field availability and compare length of input field to expected length'''
+    '''This method will check the input field availability and compare length of input field to expected length
+    if not input field in request and response it will create error message and it added to error list'''
     def validate_length_and_invalid_field(self,content,ApiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -917,7 +922,8 @@ class Validate():
         return isErrorAvailable,errorList
     
     
-    '''This method will check the input for availability and format'''
+    '''This method will check the input for availability and format
+     if input format in request is not Json it will create error message and it added to error list'''
     def check_input_body(self,content,ApiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -954,7 +960,8 @@ class Validate():
         return errorAvailable,errorList
 
 
-    '''This method used to check  mandatory,data type,valid values validation'''
+    '''This method used to check  parameter value for mandatory validation and data type,valid values validation method is called,
+    if error message is occur in request and response it will added to error list'''
     def check_all_validate(self,content,ApiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1031,7 +1038,8 @@ class Validate():
         return isErrorAvailale,errorListAll
     
     
-    '''This method used to check valid values validation'''
+    '''This method used to check parameter value valid values validation,if not valid values of parameter value,
+    it create error message it will added to error list'''
     def valid_values_validation(self,validValues,paramValue,param,dataType):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1073,7 +1081,8 @@ class Validate():
         return errorList
 
 
-    '''This method used to check Json valid values validation'''
+    '''This method used to check Json valid values validation,if not Json valid values of parameter value,
+    it create error message it will added to error list'''
     def valid_values_validation_JSON(self,validValues,paramValue,param,dataType,validValuePath):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1107,7 +1116,8 @@ class Validate():
         return errorMsg
     
     
-    '''This method used to check validation and manipulation of the data'''
+    '''This method used to check validation and manipulation of all request and response of the parameter value,
+    if data is list it will create one by one validation and manipulation.if error message is occur it will added to error list'''
     def validation_and_manipulation(self,jsonObject,apiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1211,7 +1221,7 @@ class Validate():
         
     
     
-    '''This method used to manipulate transformation of the data'''
+    '''This method used to manipulate transformation of the parameter value,the transformation validation method is called'''
     def manipulation_transformation(self,jsonObject, apiName, dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1233,7 +1243,7 @@ class Validate():
         return jsonObject
     
     
-    '''This method used to manipulate the data to default value'''
+    '''This method used to manipulate the parameter value to default value'''
     def manipulation_default(self,jsonObject, apiName, dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1252,7 +1262,7 @@ class Validate():
         return jsonObject
     
     
-    '''This method used to transform the data'''
+    '''This method used to transform the parameter value from sheet'''
     def transformation_validation(self,transformation,paramValue):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1272,7 +1282,7 @@ class Validate():
         return paramValue
     
     
-    '''This method used to check  default validation'''
+    '''This method used to check parameter value is blank default value is added when default value is there'''
     def default_validation(self,default,paramvalue):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1287,7 +1297,8 @@ class Validate():
         return paramvalue
     
     
-    '''This method will check the input for availability and format'''
+    '''This method will check the paramter value input for availability and format and validation body method is called.
+    if error in list,it will call error response'''
     def chk_input_availability_and_format(self,jsonObject,apiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1305,7 +1316,8 @@ class Validate():
         return  result
     
     
-    '''This method used to check  parameter validation'''
+    '''This method used to check  parameter value validation and validation parameter method is called.
+    if error in list,it will call error response method'''
     def validation_parameter(self,jsonObject,apiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1323,7 +1335,8 @@ class Validate():
         return  result
     
     
-    '''This method used to check all validation'''
+    '''This method used to check all validation and validation all method is called.
+    if error in list,it will call error response method'''
     def validation_all(self,jsonObject,apiName,dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1341,7 +1354,7 @@ class Validate():
         return  result
     
     
-    '''This method is used to create error response'''
+    '''This method is used to create error response from error list'''
     def errorResponse(self,errorList,stat):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1391,7 +1404,7 @@ class Validate():
         return response_data
     
     
-    '''This method used to create error message in list'''
+    '''This method used to create error message in list where all error message is added to as a list'''
     def add_list_msg(self,result):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))

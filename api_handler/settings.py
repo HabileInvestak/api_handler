@@ -30,7 +30,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-
+'''This is logger implementation settings
+we will use this logger for every event is stored'''
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -45,7 +46,7 @@ LOGGING = {
             'class':'logging.handlers.RotatingFileHandler',
             'filename': 'E:\\Investak\\investak\\logger.log',  #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\logger.log',  #Hari
-            'maxBytes': 1024*1024*5, # 5 MB
+           # 'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter':'standard',
         },  
@@ -54,7 +55,7 @@ LOGGING = {
             'class':'logging.handlers.RotatingFileHandler',
             'filename': 'E:\\Investak\\investak\\django_request.log',    #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\django_request.log',  #Hari
-            'maxBytes': 1024*1024*5, # 5 MB
+            #'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter':'standard',
         },
@@ -73,7 +74,7 @@ LOGGING = {
     }
 }
 
-# Application definition
+'''Application definition '''
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -122,7 +123,7 @@ WSGI_APPLICATION = 'api_handler.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
+'''This is Database settings'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

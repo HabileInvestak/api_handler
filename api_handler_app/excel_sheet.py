@@ -5,10 +5,12 @@ from api_handler_app.excel_read_class import *
 
 logger = logging.getLogger('api_handler_app.excel_sheet.py')
 
-'''This class is used to read api excel sheet'''
+'''This class is used to read api excel sheet
+and stored as a api dictionary with apiName is key and remaining column is value'''
 class ExcelSheetApi():
 
-    '''This method is used to read api excel sheet'''
+    '''This method is used to read api excel sheet.
+    and stored as a api dictionary with apiName is key and remaining column is value'''
     def api_home_dict(self):  
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -48,10 +50,12 @@ class ExcelSheetApi():
 
 
 #INPUT
-'''This class is used to read input excel sheet'''
+'''This class is used to read input excel sheet
+and stored as a input dictionary with apiName is key and within apiName parameter is key remaining column is value'''
 class ExcelSheetInput():
     
-    '''This method is used to read input excel sheet'''
+    '''This method is used to read input excel sheet
+    and stored as a input dictionary with apiName is key and within apiName parameter is key remaining column is value'''
     def input_dict(self):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -97,10 +101,12 @@ class ExcelSheetInput():
 
 
 #SUCCESS
-'''This class is used to read success excel sheet'''
+'''This class is used to read success excel sheet
+and stored as a success dictionary with apiName is key and within apiName parameter is key remaining column is value'''
 class ExcelSheetSuccess():
     
-    '''This method is used to read success excel sheet'''
+    '''This method is used to read success excel sheet
+    and stored as a success dictionary with apiName is key and within apiName parameter is key remaining column is value'''
     def success_dict(self):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -142,10 +148,12 @@ class ExcelSheetSuccess():
 
 
 #FAILURE
-'''This class is used to read failure excel sheet'''
+'''This class is used to read failure excel sheet
+and stored as a failure dictionary with apiName is key and within apiName parameter is key remaining column is value'''
 class ExcelSheetFailure():
 
-    '''This method is used to read failure excel sheet dictionary'''
+    '''This method is used to read failure excel sheet dictionary
+    and stored as a failure dictionary with apiName is key and within apiName parameter is key remaining column is value'''
     def failure_dict(self):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -184,10 +192,12 @@ class ExcelSheetFailure():
 
 
 #JSON ARRAY
-'''This class is used to read jsonArray excel sheet'''
+'''This class is used to read jsonArray excel sheet
+and stored as a jsonArray dictionary with arrayName is key and within arrayName parameter is key remaining column is value'''
 class ExcelSheetJson():
 
-    '''This method is used to read jsonArray excel sheet'''
+    '''This method is used to read jsonArray excel sheet
+    and stored as a jsonArray dictionary with arrayName is key and within arrayName parameter is key remaining column is value'''
     def json_dict(self):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -227,10 +237,12 @@ class ExcelSheetJson():
 
 
 #LISTS
-'''This class is used to read list excel sheet'''
+'''This class is used to read list excel sheet
+and stored as a list dictionary with listName is key and within listName sourceValue is key remaining column is value'''
 class ExcelSheetLists():
 
-    '''This method is used to read list excel sheet'''
+    '''This method is used to read list excel sheet
+    and stored as a list dictionary with listName is key and within listName sourceValue is key remaining column is value'''
     def list_dict(self):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))

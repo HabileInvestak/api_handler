@@ -16,7 +16,7 @@ from utils import UtilClass
 logger = logging.getLogger('api_handler_app.request.py')
 
 
-'''This class is used to deal with request related'''
+'''This class is used to deal with request related public key,private key validation'''
 class RequestClass():
 
     '''This method is used to generate key pair'''

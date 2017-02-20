@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 
-'''This Class is used to Store all Api request,response to data base'''
+'''This Class is used to Store all api request,response to data base with status and time stamp'''
 class Audit(models.Model):
     user_id = models.TextField()
     api_name=models.TextField()
