@@ -26,7 +26,7 @@ logger = logging.getLogger('api_handler_app.views.py')
 
 prop = Property ()
 #propObj = prop.load_property_files('D:\\InvestAK\\26-12-2016\\investak.properties')  #hari
-propObj = prop.load_property_files ('E:\\Investak\\investak.properties')  # ranjith
+#propObj = prop.load_property_files ('E:\\Investak\\investak.properties')  # ranjith
 
 
 '''Provides you with initial token for Login,it will call two api name for create initial token and it will check input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and 
@@ -78,7 +78,14 @@ def get_initial_token(request):
             privateKey2Pem = requestObj.get_private_key_pem(keyPair)
             publicKey1 = requestObj.import_key(publicKey1Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(publicKey2Pem, publicKey1, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("NO"):
+                    jData = requestObj.encrypt(publicKey2Pem, publicKey1, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_INPUT_ENCRYPTION_WITH_NO"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA")) 
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))    
             jKey = requestObj.get_jkey(publicKey1Pem)
@@ -160,6 +167,17 @@ def get_login_mode(request):
             tomcatCount=""
             jKey=""
             jData=""
+            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("NO"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_INPUT_ENCRYPTION_WITH_NO"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
+            else:
+                raise Exception(utilClass.read_property("ALGORITHM"))
             output = requestObj.send_request(bodyContent, url, authorization, "", tomcatCount, jKey, jData)
             print "output final",output
             output = json.loads(output)
@@ -232,7 +250,14 @@ def get_login_2fa(request):
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
             publicKey3=requestObj.import_key(publicKey3Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(json.dumps(result),publicKey3, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
+                    jData = requestObj.encrypt(json.dumps(result),publicKey3, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_3"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))    
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -302,7 +327,14 @@ def get_login(request):
             jsonData = json.dumps(result)
             publicKey3 = requestObj.import_key(publicKey3Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey3, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
+                    jData = requestObj.encrypt(jsonData,publicKey3, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_3"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -372,7 +404,14 @@ def get_default_login(request):
             jsonData = json.dumps(result)
             publicKey4=requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -444,7 +483,14 @@ def get_valid_pwd(request):
             jsonData = json.dumps (result)
             publicKey3=requestObj.import_key(publicKey3Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData,publicKey3, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
+                    jData = requestObj.encrypt(jsonData,publicKey3, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_3"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -515,7 +561,10 @@ def get_valid_ans(request):
             jsonData = json.dumps(result)
             publicKey3=requestObj.import_key(publicKey3Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData,publicKey3, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
+                    jData = requestObj.encrypt(jsonData,publicKey3, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_3"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -526,7 +575,10 @@ def get_valid_ans(request):
             encryptedData=output["jEncResp"]
             privateKey2 = requestObj.import_key(privateKey2Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                decryptedData=requestObj.decrypt(encryptedData,privateKey2)
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_2"):
+                    decryptedData=requestObj.decrypt(encryptedData,privateKey2)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_2"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             logger.debug(decryptedData)
@@ -606,7 +658,14 @@ def get_account_info(request):
             jsonData = json.dumps(result)
             publicKey4=requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -683,7 +742,14 @@ def get_load_retention_type(request):
             jsonData = json.dumps(result)
             publicKey4=requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
@@ -755,7 +821,14 @@ def get_check_crkt_price_range(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -823,7 +896,14 @@ def get_validate_GTD(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -892,7 +972,14 @@ def get_validate_SLM_price(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -962,7 +1049,14 @@ def get_place_order(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:   
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1029,7 +1123,14 @@ def get_order_book(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1099,7 +1200,14 @@ def get_modify_order(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1166,7 +1274,14 @@ def get_cancel_order(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1233,7 +1348,14 @@ def get_order_history(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1300,7 +1422,14 @@ def get_trade_book(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))  
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1369,7 +1498,14 @@ def get_position_book(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1437,7 +1573,14 @@ def get_holding(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1505,7 +1648,14 @@ def get_limits(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1575,7 +1725,14 @@ def get_check_transaction_password(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1645,7 +1802,14 @@ def get_user_profile(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1715,7 +1879,14 @@ def get_open_orders(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1782,7 +1953,14 @@ def get_bo_holdings(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1850,7 +2028,14 @@ def get_bo_Ul_Trades(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
@@ -1918,7 +2103,14 @@ def get_logout(request):
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
+                else:
+                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
+                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
+                    pass
+                else:
+                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)

@@ -34,12 +34,12 @@ class ExcelSheetApi():
                 logging = str(sheet.cell(rownum, 8).value).strip().strip()
                 inputApi = str(sheet.cell(rownum, 9).value).strip()
                 inputEncryption = str(sheet.cell(rownum, 10).value).strip()
-                resonseEncryption = str(sheet.cell(rownum, 11).value).strip()
+                resonseDecryption = str(sheet.cell(rownum, 11).value).strip()
                 notes = (sheet.cell(rownum, 12).value).encode('utf-8').strip()
                 inputSample = str(sheet.cell(rownum, 13).value).strip()
                 inputValidation = str(sheet.cell(rownum, 14).value).strip()
                 responseValidation = str(sheet.cell(rownum, 15).value).strip()
-                a=ApiClass(hashApi,source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseEncryption,notes,inputSample,inputValidation,responseValidation)
+                a=ApiClass(hashApi,source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseDecryption,notes,inputSample,inputValidation,responseValidation)
     
                 apiHomeDict[apiName] = [a]
 
