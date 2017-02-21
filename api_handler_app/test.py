@@ -1,5 +1,10 @@
 from properties.p import Property
 import datetime
+import json
+
+paramValue=100022269.35 #float: 100022269.35
+if (isinstance (json.loads (str(paramValue)), (float))):
+    pass
 
 import time
 paramValue='DAY1'

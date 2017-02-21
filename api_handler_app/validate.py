@@ -101,8 +101,8 @@ class Validate():
                 paramValue='0.00'
                 logger.debug("paramValue replace"+paramValue)
             print 'paramValue',paramValue
-            if paramValue and paramValue not in utilClass.read_property("NA"):
-                if (isinstance (json.loads (paramValue), (float))):
+            if paramValue and str(paramValue)!=utilClass.read_property("NA"):
+                if (isinstance (json.loads (str(paramValue)), (float))):
                     pass
                 elif(str(paramValue).isdigit()):
                     pass
@@ -1062,7 +1062,7 @@ class Validate():
                             check=1
                             words = validValues.split (',')
                             for word in words:
-                                if (str(paramValue).__contains__(word.strip())):
+                                if (str(paramValue)==word.strip()):
                                     check = 0
                             if utilClass.is_not_blank(paramValue) and check==0:
                                 pass
@@ -1221,7 +1221,8 @@ class Validate():
         
     
     
-    '''This method used to manipulate transformation of the parameter value,the transformation validation method is called'''
+    '''This method used to manipulate transformation of the parameter value,the transformation validation method is called
+    and check transformation list name,source value is correct or not in list sheet if error create error response'''
     def manipulation_transformation(self,jsonObject, apiName, dictVar):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
@@ -1229,14 +1230,42 @@ class Validate():
         allList = returnAllDict.return_dict()
         failureDict = allList[3]
         jsonDict = allList[4]
+        listDict = allList[5]
+        expectList=[]
+        expectListValue=[]
+        errorList=[]
+        errorMsg=''
         try:
             if jsonObject and  not dictVar==failureDict and not dictVar==jsonDict:
                 for param, value in jsonObject.items():
                     dataType=dictVar.get(apiName).get(param)[0].dataType
+                    transformation= dictVar.get(apiName).get(param)[0].transformation
                     if not dataType=='JSON':
-                        transformation= dictVar.get(apiName).get(param)[0].transformation
-                        value = self.transformation_validation (transformation, value)
-                        jsonObject[param] = value
+                        for listName,listValue in listDict.items():
+                            expectList.append(listName)
+                            for sourceValue,remainValue in listValue.items():
+                                if listName==transformation:
+                                    expectListValue.append(sourceValue)
+                        print 'expectList',expectList
+                        #listValue= dictVar.get(apiName).get(param)[0].transformation
+                        if transformation:
+                            if transformation in expectList:
+                                if utilClass.is_not_blank(value) and value in expectListValue:
+                                    value = self.transformation_validation (transformation, value)
+                                    jsonObject[param] = value
+                                else:
+                                    arrayValue=[value,transformation]
+                                    logger.debug(arrayValue)
+                                    errorMsg=self.create_error_message(utilClass.read_property("INVALID_TRANSFORMATION_SOURCE"),arrayValue)
+                                    errorList.append(errorMsg)
+                            else:
+                                arrayValue=[transformation]
+                                logger.debug(arrayValue)
+                                errorMsg=self.create_error_message(utilClass.read_property("INVALID_TRANSFORMATION_LIST"),arrayValue)
+                                errorList.append(errorMsg)
+                    expectList=[]
+                if errorList:
+                    jsonObject = self.errorResponse (errorList, utilClass.read_property("NOT_OK"))           
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))

@@ -474,7 +474,7 @@ def get_valid_pwd(request):
             result = validate.validation_and_manipulation (jsonObject,apiName,inputDict)
             logger.debug(result)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit(requestId,result,apiName,apiHomeDict)
+                auditTrial.api_response_audit(requestId,result,apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response(result)
     
