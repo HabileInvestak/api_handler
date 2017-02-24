@@ -1,6 +1,5 @@
 import logging
 from xlrd import open_workbook
-from utils import UtilClass 
 from api_handler_app.excel_read_class import *
 
 logger = logging.getLogger('api_handler_app.excel_sheet.py')
@@ -11,10 +10,9 @@ class ExcelSheetApi():
 
     '''This method is used to read api excel sheet.
     and stored as a api dictionary with apiName is key and remaining column is value'''
-    def api_home_dict(self):  
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def api_home_dict(self,propObj):  
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         sheet = wb.sheet_by_index(2)
         rows=sheet.nrows
         #colmns=sheet.ncols
@@ -45,7 +43,7 @@ class ExcelSheetApi():
 
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return apiHomeDict
 
 
@@ -56,10 +54,9 @@ class ExcelSheetInput():
     
     '''This method is used to read input excel sheet
     and stored as a input dictionary with apiName is key and within apiName parameter is key remaining column is value'''
-    def input_dict(self):
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def input_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         sheet = wb.sheet_by_index(4)
         rows=sheet.nrows
         #colmns=sheet.ncols
@@ -96,7 +93,7 @@ class ExcelSheetInput():
 
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return inputDict
 
 
@@ -107,10 +104,9 @@ class ExcelSheetSuccess():
     
     '''This method is used to read success excel sheet
     and stored as a success dictionary with apiName is key and within apiName parameter is key remaining column is value'''
-    def success_dict(self):
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def success_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         tempParamDict={}
         sheet = wb.sheet_by_index(5)
         rows=sheet.nrows
@@ -143,7 +139,7 @@ class ExcelSheetSuccess():
         
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return successDict
 
 
@@ -154,10 +150,9 @@ class ExcelSheetFailure():
 
     '''This method is used to read failure excel sheet dictionary
     and stored as a failure dictionary with apiName is key and within apiName parameter is key remaining column is value'''
-    def failure_dict(self):
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def failure_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         tempParamDict={}
         sheet = wb.sheet_by_index(6)
         rows=sheet.nrows
@@ -187,7 +182,7 @@ class ExcelSheetFailure():
 
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return failureDict
 
 
@@ -198,10 +193,9 @@ class ExcelSheetJson():
 
     '''This method is used to read jsonArray excel sheet
     and stored as a jsonArray dictionary with arrayName is key and within arrayName parameter is key remaining column is value'''
-    def json_dict(self):
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def json_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         tempParamDict={}
         sheet = wb.sheet_by_index(7)
         rows=sheet.nrows
@@ -231,7 +225,7 @@ class ExcelSheetJson():
 
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return jsonDict
 #print jsonArrayDict
 
@@ -243,10 +237,9 @@ class ExcelSheetLists():
 
     '''This method is used to read list excel sheet
     and stored as a list dictionary with listName is key and within listName sourceValue is key remaining column is value'''
-    def list_dict(self):
-        utilClass=UtilClass()
-        logger.info(utilClass.read_property("ENTERING_METHOD"))
-        wb = open_workbook (utilClass.read_property("API_DICTIONARY_EXCEL"))
+    def list_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         tempParamDict={}
         sheet = wb.sheet_by_index(8)
         rows=sheet.nrows
@@ -275,5 +268,5 @@ class ExcelSheetLists():
 
         except Exception as exception:
             raise exception
-        logger.info(utilClass.read_property("EXITING_METHOD"))
+        logger.info(propObj.get("EXITING_METHOD"))
         return listDict

@@ -2,47 +2,54 @@ import json
 import logging
 
 from django.http import JsonResponse
-from properties.p import Property
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
-from api_handler.wsgi import ReturnAllDict
+
+from api_handler_app.return_all_dict import ReturnAllDict
+
 from audit import AuditTrial
 from request import RequestClass
 from utils import UtilClass
 from validate import Validate
 
 
-returnAllDict = ReturnAllDict()
-allList = returnAllDict.return_dict()
-apiHomeDict = allList[0]
-inputDict = allList[1]
-successDict = allList[2]
-failureDict = allList[3]
-jsonDict = allList[4]
-listDict = allList[5]
+
 
 logger = logging.getLogger('api_handler_app.views.py')
 
-prop = Property ()
-#propObj = prop.load_property_files('D:\\InvestAK\\26-12-2016\\investak.properties')  #hari
-#propObj = prop.load_property_files ('E:\\Investak\\investak.properties')  # ranjith
+@api_view(["POST"])
+def get_excel_property_update(request):
+    ReturnAllDict().update_excel_property()
+    output='success'
+    return JsonResponse(output)
 
 
 '''Provides you with initial token for Login,it will call two api name for create initial token and it will check input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and 
 check input encryption,response decryption ,rsa algorithm'''
 @api_view(["POST"])
 def get_initial_token(request):
+    utilClass=UtilClass()
+    logger.info(utilClass.read_property("ENTERING_METHOD"))
     auditTrial=AuditTrial()
     validate=Validate()
     requestObj=RequestClass()
     output=''
     requestId=''
     apiName=''
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
         if request.method == utilClass.read_property("METHOD_TYPE"):
+           
+            #global_var="Ranjith"
+            
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
             url = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
@@ -56,7 +63,7 @@ def get_initial_token(request):
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             userId=jsonObject.get('uid')
             
@@ -64,7 +71,7 @@ def get_initial_token(request):
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit(requestId, result,apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response(result)
+                return Response(result,status=status.HTTP_200_OK)
             requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,apiHomeDict,ipAddress)
             tomcatCount=""
             jKey=""
@@ -117,28 +124,35 @@ def get_initial_token(request):
             print "##"
             auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)            
+            return Response(output,status=status.HTTP_200_OK)            
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
         print auditTrial
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
+        return Response(output,status=status.HTTP_200_OK) 
     
+  
     
 '''Get login mode and it will check input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and 
 check input encryption,response decryption ,rsa algorithm'''
 @api_view(["POST"])    
 def get_login_mode(request):
+    utilClass=UtilClass()
+    logger.info(utilClass.read_property("ENTERING_METHOD"))
     auditTrial=AuditTrial()
     validate=Validate()
     requestObj=RequestClass()
     output=''
     requestId=''
     apiName=''
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
         if request.method == utilClass.read_property("METHOD_TYPE"):
             bodyContent = request.body
@@ -154,7 +168,7 @@ def get_login_mode(request):
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             if bodyContent:
                 jsonObject = json.loads (bodyContent)
                 userId=jsonObject.get('uid')
@@ -162,7 +176,7 @@ def get_login_mode(request):
                 if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                     auditTrial.api_response_audit(requestId, result,apiName,apiHomeDict,userId)
                     logger.info(utilClass.read_property("EXITING_METHOD"))
-                    return Response(result)
+                    return Response(result,status=status.HTTP_200_OK)
             requestId= auditTrial.api_request_audit(requestId, result, apiName,userId,apiHomeDict,ipAddress)
             tomcatCount=""
             jKey=""
@@ -185,14 +199,14 @@ def get_login_mode(request):
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
             auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)            
+            return Response(output,status=status.HTTP_200_OK)            
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
         print auditTrial
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)        
+        return Response(output,status=status.HTTP_200_OK)        
 
 
 '''First step in login and it will check authorization token,
@@ -209,6 +223,12 @@ def get_login_2fa(request):
     requestId=''
     apiName=''
     userId=''
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
             ipAddress=utilClass.get_client_ip(request)
@@ -275,162 +295,8 @@ def get_login_2fa(request):
         output=validate.create_error_response(err)
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
         return Response(output)
-
-
-'''Provide you with pre-authentication key for encryption and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_login(request):
-
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("GET_PRE_AUTHENTICATION_KEY"))[0].url
-            apiName = utilClass.read_property ("GET_PRE_AUTHENTICATION_KEY")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey3Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.requestObj.get_jkey(publicKey3Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey3 = requestObj.import_key(publicKey3Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
-                    jData = requestObj.encrypt(jsonData,publicKey3, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_3"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
     
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
 
-   
-'''Gives you information about client enabled data and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_default_login(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("DEFAULT_LOGIN"))[0].url
-            apiName = utilClass.read_property ("DEFAULT_LOGIN")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization=authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n",""))
-                    tomcatCount= requestObj.b64_decode(authorization[2].replace("\n",""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            logger.debug("default login validation_and_manipulation result=")
-            logger.debug(result)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4=requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount=requestObj.get_tomcat_count(tomcatCount)
-            
-            logger.debug("Before result")
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            logger.debug(output)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
     
 '''Authenticates the user with password and it will check authorization token,
 input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
@@ -446,6 +312,12 @@ def get_valid_pwd(request):
     requestId=''
     apiName=''
     userId=''
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
             ipAddress=utilClass.get_client_ip(request)
@@ -469,14 +341,14 @@ def get_valid_pwd(request):
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             result = validate.validation_and_manipulation (jsonObject,apiName,inputDict)
             logger.debug(result)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit(requestId,result,apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response(result)
+                return Response(result,status=status.HTTP_200_OK)
     
             result = utilClass.password_hash(result)
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
@@ -501,14 +373,14 @@ def get_valid_pwd(request):
             output = validate.validation_and_manipulation (output, apiName, dictionary)  #manipulation logic and call auditTrial.api_response_audit
             auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
+            return Response(output,status=status.HTTP_200_OK)
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
         logger.debug(err)
         output=validate.create_error_response(err)
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)    
+        return Response(output,status=status.HTTP_200_OK)    
 
 
 '''Authenticates the answers in 2FA Q&A mode and it will check authorization token,
@@ -525,6 +397,12 @@ def get_valid_ans(request):
     requestId=''
     apiName=''
     userId=''
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
         if request.method == utilClass.read_property('METHOD_TYPE'):
             ipAddress=utilClass.get_client_ip(request)
@@ -549,13 +427,13 @@ def get_valid_ans(request):
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
     
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
             jsonData = json.dumps(result)
@@ -583,6 +461,7 @@ def get_valid_ans(request):
                 raise Exception(utilClass.read_property("ALGORITHM"))
             logger.debug(decryptedData)
             decryptedJson = json.loads(decryptedData)
+            print decryptedJson
             logger.debug(decryptedJson)
             dictionary =auditTrial.tso_response_audit (requestId, decryptedJson,apiName,apiHomeDict,successDict,failureDict)
             logger.debug(dictionary)
@@ -599,21 +478,21 @@ def get_valid_ans(request):
             decryptedJson = validate.validation_and_manipulation (decryptedJson, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
             auditTrial. api_response_audit (requestId, decryptedJson,apiName,apiHomeDict,userId)
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(decryptedJson)
+            return Response(decryptedJson,status=status.HTTP_200_OK)
         
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
+        return Response(output,status=status.HTTP_200_OK)
 
 
-'''Provides you with account details and it will check authorization token,
+'''This method allows you to all api name request from the application and it will check authorization token,
 input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
 response decryption ,rsa algorithm'''
 @api_view(["POST"])
-def get_account_info(request):
+def api_handler_request(request):
     utilClass=UtilClass()
     logger.info(utilClass.read_property("ENTERING_METHOD"))
     auditTrial=AuditTrial()
@@ -623,43 +502,52 @@ def get_account_info(request):
     requestId=''
     apiName=''
     userId=''
+    returnAllDict = ReturnAllDict()
+    allList = returnAllDict.return_dict()
+    apiHomeDict = allList[0]
+    inputDict = allList[1]
+    successDict = allList[2]
+    failureDict = allList[3]
     try:
-        if request.method == utilClass.read_property('METHOD_TYPE'):
+        print 'inside api method request'
+        path_var=request.path
+        path_var=path_var.replace("/","")
+        if request.method == utilClass.read_property ('METHOD_TYPE'):
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("ACCOUNT_INFO"))[0].url
-            apiName = utilClass.read_property ("ACCOUNT_INFO")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
+            url = apiHomeDict.get(utilClass.read_property(path_var))[0].url
+            apiName=utilClass.read_property(path_var)
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
             if authorization:
                 try:
-                    authorization=authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n",""))
-                    tomcatCount= requestObj.b64_decode(authorization[2].replace("\n",""))
+                    authorization = authorization.split("-")
+                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
+                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
                     userId= requestObj.b64_decode(authorization[3].replace("\n",""))
                 except Exception:
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             jKey = requestObj.get_jkey(publicKey4Pem)
+            bodyContent = request.body
+            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
     
             requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
             jsonData = json.dumps(result)
-            publicKey4=requestObj.import_key(publicKey4Pem)
+            publicKey4 = requestObj.import_key(publicKey4Pem)
             if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
+                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
                 else:
                     raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
                 if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
@@ -668,1465 +556,21 @@ def get_account_info(request):
                     raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
             else:
                 raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount=requestObj.get_tomcat_count(tomcatCount)
-            
+            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
+            print 'output ',output
             dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
             auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
+            return Response(output,status=status.HTTP_200_OK)
         
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
         auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''This method used to check log in bypass'''
-@api_view(["POST"])
-def get_login_by_pass(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    logger.info(utilClass.read_property("EXITING_METHOD"))
-    return ''
-
-'''Gives retention types for the particular exchange and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_load_retention_type(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("LOAD_RETENSION_TYPE"))[0].url
-            apiName = utilClass.read_property ("LOAD_RETENSION_TYPE")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization=authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n",""))
-                    tomcatCount= requestObj.b64_decode(authorization[2].replace("\n",""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4=requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData,publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount=requestObj.get_tomcat_count(tomcatCount)
-            
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print "output",output
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            print "dictionary",dictionary
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            print "output",output
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Check circuit limt for the order price and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_check_crkt_price_range(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:  
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("CHECK_CORRECT_PRICE_RANGE"))[0].url
-            apiName = utilClass.read_property ("CHECK_CORRECT_PRICE_RANGE")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''GTD validations are done if retention is selected and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_validate_GTD(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("VALIDATE_GTD"))[0].url
-            apiName = utilClass.read_property ("VALIDATE_GTD")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            print "Before send request"
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print "After send request",output
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)    
-
-'''Validates Stop loss price and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_validate_SLM_price(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("VALIDATE_SLM_PRICE"))[0].url
-            apiName = utilClass.read_property ("VALIDATE_SLM_PRICE")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Allows you to place order for selected scrip and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_place_order(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("PLACE_ORDER"))[0].url
-            apiName = utilClass.read_property ("PLACE_ORDER")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            print bodyContent
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            print "after result",result 
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:   
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-'''Allows you to view the placed orders and their status and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_order_book(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("ORDER_BOOK"))[0].url
-            apiName = utilClass.read_property ("ORDER_BOOK")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print output
-            logger.debug(output)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Allows you to modify open orders and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_modify_order(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("MODIFY_ORDER"))[0].url
-            apiName = utilClass.read_property ("MODIFY_ORDER")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)    
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId = auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output) 
-
-'''Allows you to cancel an open order and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_cancel_order(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("CANCEL_ORDER"))[0].url
-            apiName = utilClass.read_property ("CANCEL_ORDER")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-'''Allows you to view the order history for the Order and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_order_history(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("ORDER_HISTORY"))[0].url
-            apiName = utilClass.read_property ("ORDER_HISTORY")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-'''Allows you to view trade details and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_trade_book(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("TRADE_BOOK"))[0].url
-            apiName = utilClass.read_property ("TRADE_BOOK")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))  
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print output
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Allows you to view position book details and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''   
-@api_view(["POST"])
-def get_position_book(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("POSITION_BOOK"))[0].url
-            apiName = utilClass.read_property ("POSITION_BOOK")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''This Allows user to view the holdings and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_holding(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("HOLDING"))[0].url
-            apiName = utilClass.read_property ("HOLDING")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Allows you to view segment wise RMS limits and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_limits(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("LIMITS"))[0].url
-            apiName = utilClass.read_property ("LIMITS")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print "output=",output
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Allows you to view segment wise RMS limits and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_check_transaction_password(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("CHECK_TRANSACTION_PASSWORD"))[0].url
-            logger.debug("url",url)
-            apiName = utilClass.read_property ("CHECK_TRANSACTION_PASSWORD")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            print "output=",output
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''Provides you w ith user details and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_user_profile(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("USER_PROFILE"))[0].url
-            apiName = utilClass.read_property ("USER_PROFILE")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            print "jsonObject-------------------",jsonObject
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-
-
-'''Loads open order to set alerts based on trade and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_open_orders(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("OPEN_ORDERS"))[0].url
-            apiName = utilClass.read_property ("OPEN_ORDERS")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-    
-'''List of End of the Day holdings for clients and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_bo_holdings(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method ==utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("BO_HOLDINGS"))[0].url
-            apiName = utilClass.read_property ("BO_HOLDINGS")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-    
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''List of End of the day underlying Trades for holdings for the clients and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_bo_Ul_Trades(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("BO_UI_TRADES"))[0].url
-            apiName = utilClass.read_property ("BO_UI_TRADES")
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
-
-
-'''This method allows you to logout from the application and it will check authorization token,
-input request validation and manipulation,output response validation and manipulation method calls,Audit storage method call and check input encryption,
-response decryption ,rsa algorithm'''
-@api_view(["POST"])
-def get_logout(request):
-    utilClass=UtilClass()
-    logger.info(utilClass.read_property("ENTERING_METHOD"))
-    auditTrial=AuditTrial()
-    validate=Validate()
-    requestObj=RequestClass()
-    output=''
-    requestId=''
-    apiName=''
-    userId=''
-    try:
-        if request.method == utilClass.read_property ('METHOD_TYPE'):
-            ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("LOG_OUT"))[0].url
-            apiName=utilClass.read_property("LOG_OUT")
-            authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
-            if authorization:
-                try:
-                    authorization = authorization.split("-")
-                    publicKey4Pem = requestObj.b64_decode(authorization[1].replace("\n", ""))
-                    tomcatCount = requestObj.b64_decode(authorization[2].replace("\n", ""))
-                    userId= requestObj.b64_decode(authorization[3].replace("\n",""))
-                except Exception:
-                    raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            jKey = requestObj.get_jkey(publicKey4Pem)
-            bodyContent = request.body
-            requestId = auditTrial.investak_request_audit (userId, bodyContent, apiName,apiHomeDict,ipAddress)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result, apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-            jsonObject = json.loads (bodyContent)
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
-            if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                auditTrial.api_response_audit (requestId, result,apiName,apiHomeDict,userId)
-                logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
-    
-            requestId =auditTrial.api_request_audit (requestId, result, apiName,userId,apiHomeDict,ipAddress)
-            jsonData = json.dumps(result)
-            publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
-                if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
-                    jData = requestObj.encrypt(jsonData, publicKey4, 2048)
-                else:
-                    raise Exception(utilClass.read_property("INVALID_YES_WITH_PUBLIC_KEY_4"))
-                if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("NA"):
-                    pass
-                else:
-                    raise Exception(utilClass.read_property("INVALID_RESPONSE_DECRYPTION_WITH_NA"))
-            else:
-                raise Exception(utilClass.read_property("ALGORITHM"))
-            tomcatCount = requestObj.get_tomcat_count(tomcatCount)
-            output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            dictionary = auditTrial.tso_response_audit (requestId, output,apiName,apiHomeDict,successDict,failureDict)
-            output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-            logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)
-        
-    except Exception as exception:
-        logger.exception(exception)
-        err=str(exception)
-        output=validate.create_error_response(err)
-        auditTrial.api_response_audit (requestId, output,apiName,apiHomeDict,userId)
-        return Response(output)
+        return Response(output,status=status.HTTP_200_OK)
     
     
 ''' This method is used to create invalid url response when page is not found error is occur'''
@@ -2158,4 +602,3 @@ def server_error(request):
     except Exception as exception:
         logger.exception(exception)
         raise Exception(exception)      
-    

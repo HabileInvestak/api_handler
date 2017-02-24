@@ -1,7 +1,36 @@
 from properties.p import Property
 import datetime
 import json
+from django.http import JsonResponse
 
+output='success'
+output=json.loads(output)
+print JsonResponse(output)
+
+globvar = 0
+
+def set_globvar_to_one():
+    global globvar    # Needed to modify global copy of globvar
+    globvar = 1
+
+def print_globvar():
+    print(globvar)     # No need for global declaration to read value of globvar
+
+set_globvar_to_one()
+print_globvar()  
+
+
+expectLen=1
+contentLen=2
+if (expectLen != contentLen):
+    print 'not match'
+else:
+    print 'match'
+number=1.0
+n= str(number).strip()
+if type(n) == float:
+    int(n)
+print n
 paramValue=100022269.35 #float: 100022269.35
 if (isinstance (json.loads (str(paramValue)), (float))):
     pass

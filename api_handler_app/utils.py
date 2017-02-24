@@ -2,13 +2,13 @@ import hashlib
 import json
 import logging
 
-from properties.p import Property
+from api_handler_app.return_all_dict import ReturnAllDict
 
 
 logger = logging.getLogger('api_handler_app.utils.py')
-prop=Property()
+
 #propObj = prop.load_property_files('D:\\InvestAK\\26-12-2016\\investak.properties')  #hari
-propObj = prop.load_property_files('E:\\Investak\\investak.properties')
+#propObj = prop.load_property_files('E:\\Investak\\investak.properties')
 
 '''This class is used to deal with utility function'''
 class UtilClass():
@@ -37,6 +37,9 @@ class UtilClass():
     ''' This method will read the configuration values from property file'''
     def read_property(self,name):
         try:
+            returnAllDict = ReturnAllDict()
+            allList = returnAllDict.return_dict()
+            propObj = allList[6]
             data=propObj.get(name)
             return data
         except Exception as exception:

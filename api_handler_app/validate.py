@@ -4,7 +4,7 @@ import time
 
 import requests
 
-from api_handler.wsgi import ReturnAllDict
+from api_handler_app.return_all_dict import ReturnAllDict
 from utils import UtilClass
 
 
@@ -185,7 +185,7 @@ class Validate():
                         pass
                     else:
                         arrayValue = [param,dataType,validValues]
-                        errorMsg = self.create_error_message (errorMessageTemplate, arrayValue)
+                        errorMsg = self.create_error_message (utilClass.read_property (errorMessageTemplate), arrayValue)
         except Exception as exception:
             raise exception    
         logger.info(utilClass.read_property("EXITING_METHOD"))    
@@ -205,7 +205,7 @@ class Validate():
                         pass
                     else:
                         arrayValue = [param,dataType,validValues]
-                        errorMsg = self.create_error_message (errorMessageTemplate, arrayValue)
+                        errorMsg = self.create_error_message (utilClass.read_property (errorMessageTemplate), arrayValue)
         except Exception as exception:
             raise exception   
         logger.info(utilClass.read_property("EXITING_METHOD"))     
@@ -834,6 +834,8 @@ class Validate():
                     date = True
                 except ValueError:
                     date = False
+            else:
+                date = False
         except ValueError:
             date = False
         logger.info(utilClass.read_property("EXITING_METHOD"))    
@@ -857,6 +859,8 @@ class Validate():
                     date = True
                 except ValueError:
                     date = False
+            else:
+                date = False
         except ValueError:
             date = False
         logger.info(utilClass.read_property("EXITING_METHOD"))    
@@ -888,6 +892,7 @@ class Validate():
         expectMsg=''
         returnAllDict = ReturnAllDict()
         allList = returnAllDict.return_dict()
+        inputDict = allList[1]
         jsonDict = allList[4]
         try:
             for k, v in dictVar.items():
@@ -901,7 +906,7 @@ class Validate():
             expectLen=len (expectList)
             contentLen=len (content)
             logger.debug(content)
-            if (expectLen < contentLen) and not dictVar==jsonDict:
+            if (expectLen != contentLen) and not dictVar==jsonDict and dictVar==inputDict: #<
                 arrayValue = [expectLen,contentLen]
                 expectMsg = self.create_error_message (utilClass.read_property ("EXPECTED_AVAILABLE_PARAMETERS"), arrayValue)
                 errorList.append (expectMsg)
