@@ -1,7 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from api_handler_app import views
-
 from django.conf.urls import handler404
 from django.conf.urls import handler500
 
@@ -20,5 +19,7 @@ urlpatterns = [
    url(r'^valid_ans/',views.get_valid_ans),
    url(r'^login_mode/', views.get_login_mode),
    url(r'^excel_propery_update/', views.get_excel_property_update),
-   url(r'^[a-zA-Z0-9_.-]+/', views.api_handler_request),
+   url(r'^retrieve_all_pending_api/', views.get_retrieve_all_pending_api),
+   url(r'^retrieve_all_success_or_failure_api/', views.get_retrieve_all_success_or_failure_api),
+   url(r'^[a-zA-Z0-9_.-]+/', views.get_api_handler_request),
   ]

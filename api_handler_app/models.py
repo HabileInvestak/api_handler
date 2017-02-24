@@ -6,7 +6,7 @@ from django.db import models
 class Audit(models.Model):
     user_id = models.TextField()
     api_name=models.TextField()
-    request_id = models.AutoField(primary_key=True,unique=True,null=False)
+    request_id = models.TextField(primary_key=True,unique=True,null=False)
     investak_request_time_stamp = models.DateTimeField(null=True)
     api_request_time_stamp = models.DateTimeField(null=True)
     tso_response_time_stamp = models.DateTimeField(null=True)

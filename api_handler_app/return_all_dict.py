@@ -12,7 +12,6 @@ class ReturnAllDict():
     def update_excel_property(self):
         prop=Property()
         propObj = prop.load_property_files('E:\\Investak\\investak.properties')
-        print propObj.get("INVALID_VALUE")
         a = ExcelSheetApi()
         i = ExcelSheetInput()
         s = ExcelSheetSuccess()

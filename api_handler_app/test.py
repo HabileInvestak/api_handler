@@ -1,7 +1,24 @@
 from properties.p import Property
-import datetime
+from datetime import datetime
 import json
 from django.http import JsonResponse
+    
+import random
+
+my_date=datetime.now ()
+r=int(my_date.toordinal() + 1721424.5)
+
+print str(r)
+#2457808.5
+
+
+randomNo=random.randint(0,9)
+print randomNo
+print random.random() * 100
+r = str(random.randint(0000,9999))
+print r
+print "%04d" % r
+
 
 output='success'
 output=json.loads(output)

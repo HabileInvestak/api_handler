@@ -1,6 +1,8 @@
+from datetime import datetime
 import hashlib
 import json
 import logging
+import random
 
 from api_handler_app.return_all_dict import ReturnAllDict
 
@@ -62,6 +64,21 @@ class UtilClass():
             raise exception        
         logger.info(self.read_property("EXITING_METHOD"))      
         return data
+
+
+    '''This method is used to create PasswordHash'''
+    def generate_request_id(self,userId,apiName):
+        
+        logger.info(self.read_property("ENTERING_METHOD"))        
+        try:
+            dateTime = str(datetime.now ())
+            randomNo=str(random.randint(1111,9999))
+            requestId=userId+'_'+apiName+'_'+dateTime+'_'+randomNo
+            print 'requestId',requestId
+        except Exception as exception:
+            raise exception        
+        logger.info(self.read_property("EXITING_METHOD"))      
+        return requestId
 
 
     '''This method will check whether the given input is in JSON format or not'''

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('user_id', models.TextField()),
                 ('api_name', models.TextField()),
-                ('request_id', models.AutoField(unique=True, serialize=False, primary_key=True)),
+                ('request_id', models.TextField(unique=True, serialize=False, primary_key=True)),
                 ('investak_request_time_stamp', models.DateTimeField(null=True)),
                 ('api_request_time_stamp', models.DateTimeField(null=True)),
                 ('tso_response_time_stamp', models.DateTimeField(null=True)),

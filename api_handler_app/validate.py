@@ -1173,7 +1173,7 @@ class Validate():
                         logger.debug(result)
                         if not result:
                             logger.debug("After manipulation_transformation in success")
-                            jsonObject = self.manipulation_transformation(response, apiName, dictVar)
+                            response = self.manipulation_transformation(response, apiName, dictVar)
                             result=response
                             logger.debug("result="+str(result))
                         if result:
@@ -1187,6 +1187,14 @@ class Validate():
                         resultAll.append(result) 
                 return resultAll       
             else:            # it is a dictionary
+                stat = jsonObject.get(utilClass.read_property('STATUS'))
+                if not dictVar==inputDict:
+                    if stat == utilClass.read_property ('OK'):
+                        dictVar=successDict
+                    elif stat == utilClass.read_property ('NOT_OK'):
+                        dictVar=failureDict
+                    else:
+                        dictVar=successDict
                 if(dictVar==inputDict and inputValidation==utilClass.read_property("YES")):
                     logger.debug("Validation parameter")
                     result = self.validation_parameter (jsonObject, apiName, dictVar)
@@ -1444,7 +1452,7 @@ class Validate():
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         listvar=[]
         try:
-            if type(result) is list:
+            if type(result) is list: #it is list
                 eMsg=result[0].get(utilClass.read_property('ERROR_MSG'))
                 listvar.append(eMsg)
                 result[0][utilClass.read_property('ERROR_MSG')]=listvar

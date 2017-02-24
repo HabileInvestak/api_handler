@@ -1,6 +1,5 @@
 from datetime import datetime
 import logging
-
 from api_handler_app.models import Audit
 from utils import UtilClass
 
@@ -13,10 +12,9 @@ class AuditTrial():
     
     '''This method will store the request of Investak to database
     and it create request id which has unique id for the apiName when investak_api audit enable is Yes'''
-    def investak_request_audit(self,userId,bodyContent,apiName,apiHomeDict,ipAddress):
+    def investak_request_audit(self,userId,bodyContent,apiName,apiHomeDict,ipAddress,requestId):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
-        requestId=''
         try:
             dateNow = datetime.now ()
             logging = apiHomeDict.get(apiName)[0].logging
@@ -24,14 +22,12 @@ class AuditTrial():
             logger.debug("Logging="+logging)
             if (logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                 logger.debug("Investak API audit enable")
-                auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress)
+                auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId)
                 auditobj.save()
-                requestId=auditobj.request_id
                 logger.debug("requestId="+str(requestId))
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return requestId
     
 
     '''This method will store the request of api to database
@@ -48,13 +44,11 @@ class AuditTrial():
                     defaults={utilClass.read_property('API_REQUEST'): request,utilClass.read_property('API_REQUEST_TIME_STAMP'):dateNow,utilClass.read_property('USER_ID'):userId},
                 )
             else:
-                auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress)
+                auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId)
                 auditobj.save ()
-                requestId = auditobj.request_id   
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return requestId
     
     
     '''This method will store the response of api to database
@@ -104,7 +98,6 @@ class AuditTrial():
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         tsoStatus=''
-        dictionary={}
         try:
             dateNow = datetime.now ()
             #find json array
@@ -127,13 +120,10 @@ class AuditTrial():
                 stat = request.get(utilClass.read_property('STATUS'))
                 if stat == utilClass.read_property ('OK'):
                     tsoStatus = utilClass.read_property('SUCCESS')
-                    dictionary=successDict
                 elif stat == utilClass.read_property ('NOT_OK'):
                     tsoStatus = utilClass.read_property('FAILURE')
-                    dictionary=failureDict
                 else:
                     tsoStatus=utilClass.read_property('SUCCESS')
-                    dictionary=successDict
                 logger.debug(apiName)
                 logging = apiHomeDict.get(apiName)[0].logging
                 if (logging == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
@@ -144,4 +134,3 @@ class AuditTrial():
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return dictionary
