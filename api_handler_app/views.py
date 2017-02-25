@@ -1,5 +1,7 @@
 import json
 import logging
+
+
 from threading import Thread
 
 from django.db.models import Q
@@ -32,6 +34,7 @@ def get_initial_token(request):
     output=''
     requestId=''
     apiName=''
+    userId=""
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -39,23 +42,43 @@ def get_initial_token(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
         if request.method == utilClass.read_property("METHOD_TYPE"): 
+            #print sourceUrl
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
+            url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
             apiName = utilClass.read_property ("GET_INITIAL_KEY")
             authorization = request.META.get(utilClass.read_property("AUTHORIZATION"))
-            userId=""
             '''Store InvestAK request for audit trial purpose'''
             requestId = utilClass.generate_request_id("ANAN",apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
             '''This method will check input availability and input format'''
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -64,12 +87,12 @@ def get_initial_token(request):
             userId=jsonObject.get('uid')
             result = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response(result,status=status.HTTP_200_OK)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             tomcatCount=""
@@ -83,7 +106,8 @@ def get_initial_token(request):
             publicKey2Pem = requestObj.get_public_key_pem(keyPair)
             privateKey2Pem = requestObj.get_private_key_pem(keyPair)
             publicKey1 = requestObj.import_key(publicKey1Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("NO"):
                     jData = requestObj.encrypt(publicKey2Pem, publicKey1, 2048)
                 else:
@@ -106,12 +130,13 @@ def get_initial_token(request):
                 initialPublicKey3 = output[utilClass.read_property('PUBLIC_KEY3')]
                 privateKey2 = requestObj.import_key(privateKey2Pem)
                 print "Before algo"
-                if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+                encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+                if(utilClass.read_property('RSA')==encryptionMethod):
                     decryptedPublicKey3 = requestObj.decrypt(initialPublicKey3, privateKey2)
                 else:
                     raise Exception(utilClass.read_property("ALGORITHM"))
                 initialToken = utilClass.replace_text(requestObj.b64_encode(privateKey2Pem),"\n","") + utilClass.read_property('HYPEN') + utilClass.replace_text(requestObj.b64_encode(decryptedPublicKey3),"\n","") + utilClass.read_property('HYPEN') + utilClass.replace_text(requestObj.b64_encode(tomcatCount),"\n","") + utilClass.read_property('HYPEN') + utilClass.replace_text(requestObj.b64_encode(userId),"\n","")
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             if stat==utilClass.read_property('OK'):
@@ -122,7 +147,7 @@ def get_initial_token(request):
             print output
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
             print "output",output
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -132,7 +157,7 @@ def get_initial_token(request):
         err=str(exception)
         output=validate.create_error_response(err)
         print auditTrial
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output,status=status.HTTP_200_OK) 
@@ -151,6 +176,7 @@ def get_login_mode(request):
     output=''
     requestId=''
     apiName=''
+    userId=""
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -158,23 +184,43 @@ def get_login_mode(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
         if request.method == utilClass.read_property("METHOD_TYPE"):
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_MODE"))[0].url
+            url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("LOGIN_MODE"))[0].url
             apiName = utilClass.read_property ("LOGIN_MODE")
             authorization = request.META.get(utilClass.read_property("AUTHORIZATION"))
-            userId=""
+           
             '''Store InvestAK request for audit trial purpose'''
             requestId = utilClass.generate_request_id("ANAN",apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
             '''This method will check input availability and input format'''
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -184,18 +230,19 @@ def get_login_mode(request):
                 userId=jsonObject.get('uid')
                 result = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
                 if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                    apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                    apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                     apiResThread.daemon = True
                     apiResThread.start()
                     logger.info(utilClass.read_property("EXITING_METHOD"))
                     return Response(result,status=status.HTTP_200_OK)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             tomcatCount=""
             jKey=""
             jData=""
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("NO"):
                     pass
                 else:
@@ -209,11 +256,11 @@ def get_login_mode(request):
             output = requestObj.send_request(bodyContent, url, authorization, "", tomcatCount, jKey, jData)
             print "output final",output
             output = json.loads(output)
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -223,7 +270,7 @@ def get_login_mode(request):
         err=str(exception)
         output=validate.create_error_response(err)
         print auditTrial
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output,status=status.HTTP_200_OK)        
@@ -250,10 +297,20 @@ def get_login_2fa(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_2FA"))[0].url
+            url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("LOGIN_2FA"))[0].url
             apiName = utilClass.read_property ("LOGIN_2FA")
             bodyContent = request.body
             logger.debug("userJSON="+bodyContent)
@@ -270,15 +327,25 @@ def get_login_2fa(request):
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             requestId = utilClass.generate_request_id(userId,apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
             logger.debug("userId="+userId)
             jKey = requestObj.get_jkey(publicKey3Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             logger.debug("result="+str(result))
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -289,16 +356,17 @@ def get_login_2fa(request):
             logger.debug("After validation_and_manipulation="+str(result))
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 logger.debug("Inside Status")
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response (result)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             publicKey3=requestObj.import_key(publicKey3Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
                     jData = requestObj.encrypt(json.dumps(result),publicKey3, 2048)
                 else:
@@ -312,12 +380,12 @@ def get_login_2fa(request):
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
             
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             logger.debug(dictionary)
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -326,7 +394,7 @@ def get_login_2fa(request):
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output)
@@ -354,10 +422,20 @@ def get_valid_pwd(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property("VALID_PASSWORD"))[0].url
+            url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("VALID_PASSWORD"))[0].url
             apiName = utilClass.read_property("VALID_PASSWORD")
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
@@ -372,13 +450,23 @@ def get_valid_pwd(request):
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             requestId = utilClass.generate_request_id(userId,apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
             jKey = requestObj.get_jkey(publicKey3Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -387,19 +475,20 @@ def get_valid_pwd(request):
             result = validate.validation_and_manipulation (jsonObject,apiName,inputDict)
             logger.debug(result)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response(result,status=status.HTTP_200_OK)
     
             result = utilClass.password_hash(result)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             jsonData = json.dumps (result)
             publicKey3=requestObj.import_key(publicKey3Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
                     jData = requestObj.encrypt(jsonData,publicKey3, 2048)
                 else:
@@ -413,12 +502,12 @@ def get_valid_pwd(request):
             tomcatCount=requestObj.get_tomcat_count(tomcatCount)
 
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             logger.debug("Before success validation")
             output = validate.validation_and_manipulation (output, apiName, dictionary)  #manipulation logic and call auditTrial.api_response_audit
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -428,7 +517,7 @@ def get_valid_pwd(request):
         err=str(exception)
         logger.debug(err)
         output=validate.create_error_response(err)
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output,status=status.HTTP_200_OK)    
@@ -455,10 +544,20 @@ def get_valid_ans(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
         if request.method == utilClass.read_property('METHOD_TYPE'):
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property("VALID_ANSWER"))[0].url
+            url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property("VALID_ANSWER"))[0].url
             apiName = utilClass.read_property ("VALID_ANSWER")
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
@@ -474,13 +573,23 @@ def get_valid_ans(request):
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             requestId = utilClass.generate_request_id(userId,apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
             jKey = requestObj.get_jkey(publicKey3Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -488,17 +597,18 @@ def get_valid_ans(request):
             jsonObject = json.loads (bodyContent)
             result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response (result,status=status.HTTP_200_OK)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             jsonData = json.dumps(result)
             publicKey3=requestObj.import_key(publicKey3Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_3"):
                     jData = requestObj.encrypt(jsonData,publicKey3, 2048)
                 else:
@@ -512,7 +622,8 @@ def get_valid_ans(request):
             
             encryptedData=output["jEncResp"]
             privateKey2 = requestObj.import_key(privateKey2Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].resonseDecryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_2"):
                     decryptedData=requestObj.decrypt(encryptedData,privateKey2)
                 else:
@@ -523,7 +634,7 @@ def get_valid_ans(request):
             decryptedJson = json.loads(decryptedData)
             print decryptedJson
             logger.debug(decryptedJson)
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, decryptedJson,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, decryptedJson,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             if decryptedJson[utilClass.read_property('STATUS')]==utilClass.read_property('OK'):
@@ -537,7 +648,7 @@ def get_valid_ans(request):
                 decryptedJson = {utilClass.read_property('STATUS'): stat,utilClass.read_property('ERROR_MSG'): emsg}
             logger.debug(str(decryptedJson))
             decryptedJson = validate.validation_and_manipulation (decryptedJson, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, decryptedJson, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, decryptedJson, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -547,7 +658,7 @@ def get_valid_ans(request):
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output,status=status.HTTP_200_OK)
@@ -574,13 +685,23 @@ def get_api_handler_request(request):
     inputDict = allList[1]
     successDict = allList[2]
     failureDict = allList[3]
+    systemDict=allList[7]
     try:
-        print 'inside api method request'
-        path_var=request.path
-        path_var=path_var.replace("/","")
         if request.method == utilClass.read_property ('METHOD_TYPE'):
+            path_var=request.path
+            path_var=path_var.replace("/","")
+            httpScheme= request.scheme               # http or https
+            domainName= request.META['HTTP_HOST']
+            requestUrl=httpScheme+'://'+domainName+'/'
+            try:
+                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
+            urlPath = apiHomeDict.get(utilClass.read_property(path_var))[0].url
+            url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            url = apiHomeDict.get(utilClass.read_property(path_var))[0].url
+            ipAddress=utilClass.get_client_ip(request)
             apiName=utilClass.read_property(path_var)
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
@@ -595,13 +716,23 @@ def get_api_handler_request(request):
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             requestId=utilClass.generate_request_id(userId,apiName)
-            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId))
+            investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
             jKey = requestObj.get_jkey(publicKey4Pem)
-            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict)
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
+            result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -609,17 +740,18 @@ def get_api_handler_request(request):
             jsonObject = json.loads (bodyContent)
             result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
-                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId))
+                apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
                 apiResThread.daemon = True
                 apiResThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
                 return Response (result,status=status.HTTP_200_OK)
-            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress))
+            apiReqThread = Thread(target = auditTrial.api_request_audit , args=(requestId, result, apiName,userId,apiHomeDict,ipAddress,systemDict,sourceUrl))
             apiReqThread.daemon = True
             apiReqThread.start()
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
-            if(utilClass.read_property('ALGORITHM_TYPE')=='RSA'):
+            encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
+            if(utilClass.read_property('RSA')==encryptionMethod):
                 if apiHomeDict.get(apiName)[0].inputEncryption==utilClass.read_property("YES_WITH_PUBLIC_KEY_4"):
                     jData = requestObj.encrypt(jsonData, publicKey4, 2048)
                 else:
@@ -633,11 +765,11 @@ def get_api_handler_request(request):
             tomcatCount = requestObj.get_tomcat_count(tomcatCount)
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
             print 'output ',output
-            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict))
+            tsoResThread = Thread(target = auditTrial.tso_response_audit , args=(requestId, output,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl))
             tsoResThread.daemon = True
             tsoResThread.start()
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
-            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+            apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
             apiResThread.daemon = True
             apiResThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -647,30 +779,38 @@ def get_api_handler_request(request):
         logger.exception(exception)
         err=str(exception)
         output=validate.create_error_response(err)
-        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId))
+        apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, output, apiName,apiHomeDict,userId,systemDict,sourceUrl))
         apiResThread.daemon = True
         apiResThread.start()
         return Response(output,status=status.HTTP_200_OK)
  
  
-''' This method is used to read update excel and property file''' 
+''' This method is used to read update excel and property file without restarting server''' 
 @api_view(["POST"])
 def get_excel_property_update(request):
     utilClass=UtilClass()
-    if request.method == utilClass.read_property ('METHOD_TYPE'):
-        ReturnAllDict().update_excel_property()
-        output='success'
-        return JsonResponse(output) 
+    validate=Validate()
+    output={}
+    try:
+        if request.method == utilClass.read_property ('METHOD_TYPE'):
+            ReturnAllDict().update_excel_property()
+            msg=utilClass.read_property("UPDATE_EXCEL_PROPERTY")
+            output[utilClass.read_property ('MESSAGE')]=msg
+            output[utilClass.read_property ('STATUS')]=utilClass.read_property ('OK')
+            return JsonResponse(output,status=status.HTTP_200_OK) 
+    except Exception:
+        msg=utilClass.read_property("UPDATE_EXCEL_PROPERTY_FAIL")
+        output=validate.create_error_response(msg)
+        return Response(output,status=status.HTTP_200_OK)  
    
-   
-''' This method is used to retrieve all pending api that is still in processing'''     
+''' This method is used to retrieve all pending api that is still in processing that is any one of api status or tso status not updated'''     
 @api_view(["POST"])
 def get_retrieve_all_pending_api(request):
     utilClass=UtilClass()
     validate=Validate()
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
-            audit = Audit.objects.filter(api_status="",tso_status="")
+            audit = Audit.objects.filter(Q(api_status="") | Q(tso_status=""))
             serializer = AuditSerializer(audit, many=True)
             return Response(serializer.data) 
     except Exception as exception:
@@ -680,7 +820,9 @@ def get_retrieve_all_pending_api(request):
         return Response(output,status=status.HTTP_200_OK)
         #except Audit.DoesNotExist:
 
-''' This method is used to retrieve all success or failure api'''
+''' This method is used to retrieve all success or failure api
+In case success response we want api status and tso status is success only,
+In case failure response we want any one of api status or tso status is failure only'''
 @api_view(["POST"])
 def get_retrieve_all_success_or_failure_api(request):
     utilClass=UtilClass()
@@ -690,9 +832,9 @@ def get_retrieve_all_success_or_failure_api(request):
             bodyContent = request.body
             jsonObject = json.loads (bodyContent)
             status=str(jsonObject.get("status"))
-            if status=='S':
+            if status==utilClass.read_property ('SUCCESS'):
                 audit = Audit.objects.filter(api_status=status,tso_status=status)
-            if status=='F':
+            if status==utilClass.read_property ('FAILURE'):
                 audit = Audit.objects.filter(Q(api_status=status) | Q(tso_status=status))
             serializer = AuditSerializer(audit, many=True)
             return Response(serializer.data) 

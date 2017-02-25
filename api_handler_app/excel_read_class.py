@@ -97,3 +97,22 @@ class ListClass(object):
         self.sourceValue = sourceValue
         self.targetValue = targetValue
         self.dataType = dataType
+        
+
+'''This class is used to initialize list excel sheet'''
+class SystemClass(object):
+
+    '''This method is used to initialize list excel sheet'''
+    def __init__(self,systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,notes,sourceUrl,targetUrl):
+        self.systemColHash = systemColHash
+        self.systemName = systemName
+        self.systemType = systemType
+        self.dataContainerType = dataContainerType
+        self.targetDeliveryLocation = targetDeliveryLocation
+        self.encryptionMethod = encryptionMethod
+        self.loggingRequired = loggingRequired
+        self.recordSeperator = recordSeperator
+        self.fieldSeperator = fieldSeperator
+        self.notes = notes
+        self.sourceUrl = sourceUrl
+        self.targetUrl = targetUrl

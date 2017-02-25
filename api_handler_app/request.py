@@ -112,10 +112,13 @@ class RequestClass():
                           'jData': jData}
                 print "Before values",values
                 data = urllib.urlencode(values)
-                req = urllib2.Request(url, data)
-                response = urllib2.urlopen(req)
-                thePage = response.read()
-                d = json.loads(thePage)
+                try:
+                    req = urllib2.Request(url, data)
+                    response = urllib2.urlopen(req)
+                    thePage = response.read()
+                    d = json.loads(thePage)
+                except Exception:
+                    raise ValueError(utilClass.read_property("INVALID_TARGET_URL"))
                 logger.info(utilClass.read_property("EXITING_METHOD"))  
                 print "@@@@@@@@@@@@@@@@@@@@@@"
                 print d

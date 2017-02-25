@@ -18,13 +18,15 @@ class ReturnAllDict():
         f = ExcelSheetFailure()
         j = ExcelSheetJson()
         l = ExcelSheetLists()
+        sys = ExcelSheetSystem()
         apiHomeDict = a.api_home_dict(propObj)
         inputDict = i.input_dict(propObj)
         successDict = s.success_dict(propObj)
         failureDict = f.failure_dict(propObj)
         jsonDict = j.json_dict(propObj)
         listDict = l.list_dict(propObj) 
-        listOfDictTemp=[apiHomeDict,inputDict,successDict,failureDict,jsonDict,listDict,propObj]
+        systemDict = sys.system_dict(propObj) 
+        listOfDictTemp=[apiHomeDict,inputDict,successDict,failureDict,jsonDict,listDict,propObj,systemDict]
         global listOfDict
         listOfDict=listOfDictTemp
         print "call Loading dictioanry from excel once deployment"

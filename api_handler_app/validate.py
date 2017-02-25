@@ -102,15 +102,18 @@ class Validate():
                 logger.debug("paramValue replace"+paramValue)
             print 'paramValue',paramValue
             if paramValue and str(paramValue)!=utilClass.read_property("NA"):
-                if (isinstance (json.loads (str(paramValue)), (float))):
+                splitNum=paramValue.split('.', 1)
+                if(str(paramValue).isdigit()):
                     pass
-                elif(str(paramValue).isdigit()):
+                elif (isinstance (json.loads (str(paramValue)), (float)) and splitNum[1].isdigit() and splitNum[0].isdigit ()):
                     pass
                 else:
                     arrayValue = [param, dataType,validValues]
                     errorMsg = self.create_error_message (utilClass.read_property (errorMessageTemplate), arrayValue)
-        except Exception as exception:
-            raise exception
+                
+        except Exception:
+            arrayValue = [param, dataType,validValues]
+            errorMsg = self.create_error_message (utilClass.read_property (errorMessageTemplate), arrayValue)
         logger.info(utilClass.read_property("EXITING_METHOD"))
         return errorMsg
     
@@ -929,23 +932,29 @@ class Validate():
     
     '''This method will check the input for availability and format
      if input format in request is not Json it will create error message and it added to error list'''
-    def check_input_body(self,content,ApiName,dictVar):
+    def check_input_body(self,content,ApiName,dictVar,sourceUrl):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         errorAvailable=False
         errorList=[]
+        returnAllDict = ReturnAllDict()
+        allList = returnAllDict.return_dict()
+        systemDict = allList[7]
         try:
             isInputAvailable=dictVar.get(ApiName)[0].inputApi
             if isInputAvailable==utilClass.read_property("YES"):
                 if content:
-                    if(utilClass.read_property('INPUT_OUTPUT_TYPE')==utilClass.read_property ("JSON")):
+                    dataContainerType=systemDict.get(sourceUrl)[0].dataContainerType
+                    if(dataContainerType==utilClass.read_property ("JSON")):
                         result=utilClass.check_json(content)
                         if result==False:
                             arrayValue = [utilClass.read_property ("JSON")]
                             errorMsg = self.create_error_message (utilClass.read_property ("BODY_INPUT_INVALID_FORMAT"), arrayValue)
                             errorList.append (errorMsg)
                     else:
-                        pass#raise Exception(read_property('111'))            
+                        arrayValue = [utilClass.read_property ("JSON")]
+                        errorMsg = self.create_error_message (utilClass.read_property ("BODY_INPUT_INVALID_FORMAT"), arrayValue)
+                        errorList.append (errorMsg)           
                 else:
                     arrayValue = []
                     errorMsg = self.create_error_message (utilClass.read_property ("BODY_INPUT_REQUIRED"), arrayValue)
@@ -1341,13 +1350,13 @@ class Validate():
     
     '''This method will check the paramter value input for availability and format and validation body method is called.
     if error in list,it will call error response'''
-    def chk_input_availability_and_format(self,jsonObject,apiName,dictVar):
+    def chk_input_availability_and_format(self,jsonObject,apiName,dictVar,sourceUrl):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         result = {}
         try:
             # if (dict == apiHomeDict)
-            param = self.check_input_body(jsonObject, apiName, dictVar)
+            param = self.check_input_body(jsonObject, apiName, dictVar,sourceUrl)
             isError = param[0]
             errorList = param[1]
             if (isError == True):

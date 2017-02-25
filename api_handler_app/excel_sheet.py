@@ -270,3 +270,45 @@ class ExcelSheetLists():
             raise exception
         logger.info(propObj.get("EXITING_METHOD"))
         return listDict
+    
+    
+#SYSTEM
+'''This class is used to read system excel sheet
+and stored as a list dictionary with listName is key and within listName sourceValue is key remaining column is value'''
+class ExcelSheetSystem():
+
+    '''This method is used to read list excel sheet
+    and stored as a list dictionary with listName is key and within listName sourceValue is key remaining column is value'''
+    def system_dict(self,propObj):
+        logger.info(propObj.get("ENTERING_METHOD"))
+        wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
+        sheet = wb.sheet_by_index(1)
+        rows=sheet.nrows
+        #colmns=sheet.ncols
+        systemDict = {}
+        try:
+            for rownum in range(rows):
+                if rownum==0:
+                    continue
+                systemColHash=str(sheet.cell(rownum,0).value).strip()
+                systemName= str(sheet.cell(rownum,1).value).strip()
+                systemType= str(sheet.cell(rownum,2).value).strip()
+                dataContainerType =  str(sheet.cell(rownum, 3).value).strip()
+                targetDeliveryLocation =  str(sheet.cell(rownum, 4).value).strip()
+                encryptionMethod =  str(sheet.cell(rownum, 5).value).strip()
+                loggingRequired =  str(sheet.cell(rownum, 6).value).strip()
+                recordSeperator =  str(sheet.cell(rownum, 7).value).strip()
+                fieldSeperator =  str(sheet.cell(rownum, 8).value).strip()
+                notes =  str(sheet.cell(rownum, 9).value).encode('utf-8').strip()
+                sourceUrl =  str(sheet.cell(rownum, 10).value).strip()
+                targetUrl =  str(sheet.cell(rownum, 11).value).strip()
+                
+                sys=SystemClass(systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,notes,sourceUrl,targetUrl)
+                
+                systemDict[sourceUrl] = [sys]
+                
+
+        except Exception as exception:
+            raise exception
+        logger.info(propObj.get("EXITING_METHOD"))
+        return systemDict
