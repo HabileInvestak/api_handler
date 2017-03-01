@@ -71,15 +71,31 @@ class ExcelSheetInput():
                     continue
                 inputColHash= str(sheet.cell(rownum,0).value).strip()
                 apiName= str(sheet.cell(rownum,1).value).strip()
-                sno =  str(sheet.cell(rownum, 2).value).strip()
+                sno =  sheet.cell(rownum, 2).value
+                if isinstance(sno, float) and sno.is_integer():
+                    sno = int(sno)
+                else:
+                    sno = str(sno).strip()
                 parameter = str(sheet.cell(rownum, 3).value).strip()
                 description =(sheet.cell(rownum, 4).value).encode('utf-8').strip()
                 businessTag =  str(sheet.cell(rownum, 5).value).strip()
                 dataType = str(sheet.cell(rownum, 6).value).strip()
-                validValues = str(sheet.cell(rownum, 7).value).strip()
+                validValues = sheet.cell(rownum, 7).value
+                if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
+                    validValues = int(validValues)
+                else:
+                    validValues = str(validValues).strip()
                 optional = str(sheet.cell(rownum, 8).value).strip()
-                default = str(sheet.cell(rownum, 9).value).strip()
-                transformation = str(sheet.cell(rownum, 10).value).strip()
+                default = sheet.cell(rownum, 9).value
+                if dataType!='Decimal' and isinstance(default, float) and default.is_integer():
+                    default = int(default)
+                else:
+                    default = str(default).strip()
+                transformation = sheet.cell(rownum, 10).value
+                if dataType!='Decimal' and isinstance(transformation, float) and transformation.is_integer():
+                    transformation = int(transformation)
+                else:
+                    transformation = str(transformation).strip()
                 investakScreenFieldSample = str(sheet.cell(rownum, 11).value).strip()
                 if apiName not in inputDict:
                     inputDict[apiName] = {}
@@ -119,14 +135,26 @@ class ExcelSheetSuccess():
                     continue
                 successColHash= str(sheet.cell(rownum,0).value).strip()
                 apiName= str(sheet.cell(rownum,1).value).strip()
-                sno =  str(sheet.cell(rownum, 2).value).strip()
+                sno =  sheet.cell(rownum, 2).value
+                if isinstance(sno, float) and sno.is_integer():
+                    sno = int(sno)
+                else:
+                    sno = str(sno).strip()
                 parameter = str(sheet.cell(rownum, 3).value).strip()
                 description = (sheet.cell(rownum, 4).value).encode('utf-8').strip()
                 businessTag =  str(sheet.cell(rownum, 5).value).strip()
                 dataType = str(sheet.cell(rownum, 6).value).strip()
-                validValues =  str(sheet.cell(rownum, 7).value).strip()
+                validValues =  sheet.cell(rownum, 7).value
+                if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
+                    validValues = int(validValues)
+                else:
+                    validValues = str(validValues).strip()
                 optional =  str(sheet.cell(rownum, 8).value).strip()
-                transformation =  str(sheet.cell(rownum, 9).value).strip()
+                transformation =  sheet.cell(rownum, 9).value
+                if dataType!='Decimal' and isinstance(transformation, float) and transformation.is_integer():
+                    transformation = int(transformation)
+                else:
+                    transformation = str(transformation).strip()
                 specialProcess = str(sheet.cell(rownum, 10).value).strip()
                 if apiName not in successDict:
                     successDict[apiName] = {}
@@ -166,11 +194,20 @@ class ExcelSheetFailure():
                     continue
                 failureColHash= str(sheet.cell(rownum,0).value).strip()
                 apiName= str(sheet.cell(rownum,1).value).strip()
-                sno =str(sheet.cell(rownum, 2).value).strip()
+                sno =sheet.cell(rownum, 2).value
+                if isinstance(sno, float) and sno.is_integer():
+                    sno = int(sno)
+                else:
+                    sno = str(sno).strip()
                 parameter =  str(sheet.cell(rownum, 3).value).strip()
                 description = (sheet.cell(rownum, 4).value).encode('utf-8').strip()
                 dataType =  str(sheet.cell(rownum, 5).value).strip()
-                validValues =  str(sheet.cell(rownum, 6).value).strip()
+                validValues = sheet.cell(rownum, 6).value
+                if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
+                    validValues = int(validValues)
+                else:
+                    validValues = str(validValues).strip()
+                
                 if apiName not in failureDict:
                     failureDict[apiName] = {}
                 f = FailureClass(failureColHash, apiName, sno, parameter, description,dataType, validValues)
@@ -208,11 +245,20 @@ class ExcelSheetJson():
                     continue
                 jsonColHash= str(sheet.cell(rownum,0).value).strip()
                 arrayName= str(sheet.cell(rownum,1).value).strip()
-                sno =  str(sheet.cell(rownum, 2).value).strip()
+                sno =  sheet.cell(rownum, 2).value
+                if isinstance(sno, float) and sno.is_integer():
+                    sno = int(sno)
+                else:
+                    sno = str(sno).strip()
                 parameter =  str(sheet.cell(rownum, 3).value).strip()
                 description =  (sheet.cell(rownum, 4).value).encode('utf-8').strip()
                 dataType =  str(sheet.cell(rownum, 5).value).strip()
-                validValues =  str(sheet.cell(rownum, 6).value).strip()
+                validValues =  sheet.cell(rownum, 6).value
+                if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
+                    validValues = int(validValues)
+                else:
+                    validValues = str(validValues).strip()
+                
                 if arrayName not in jsonDict:
                     jsonDict[arrayName] = {}
                 j=JsonArrayClass(jsonColHash,arrayName,sno,parameter,description,dataType,validValues)
@@ -252,7 +298,11 @@ class ExcelSheetLists():
                     continue
                 listColHash= str(sheet.cell(rownum,0).value).strip()
                 listName= str(sheet.cell(rownum,1).value).strip()
-                listNo =  str(sheet.cell(rownum, 2).value).strip()
+                listNo =  sheet.cell(rownum, 2).value
+                if isinstance(listNo, float) and listNo.is_integer():
+                    listNo = int(listNo)
+                else:
+                    listNo = str(listNo).strip()
                 sourceValue =  str(sheet.cell(rownum, 3).value).strip()
                 targetValue =  str(sheet.cell(rownum, 4).value).strip()
                 dataType =  str(sheet.cell(rownum, 5).value).strip()

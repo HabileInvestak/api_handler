@@ -102,10 +102,10 @@ class Validate():
                 logger.debug("paramValue replace"+paramValue)
             print 'paramValue',paramValue
             if paramValue and str(paramValue)!=utilClass.read_property("NA"):
-                splitNum=paramValue.split('.', 1)
+                splitNum=str(paramValue).split('.', 1)
                 if(str(paramValue).isdigit()):
                     pass
-                elif (isinstance (json.loads (str(paramValue)), (float)) and splitNum[1].isdigit() and splitNum[0].isdigit ()):
+                elif (isinstance (json.loads (str(paramValue)), (float)) and str(splitNum[1]).isdigit() and str(abs(int(splitNum[0]))).isdigit ()):#-ve value replace to +ve value
                     pass
                 else:
                     arrayValue = [param, dataType,validValues]

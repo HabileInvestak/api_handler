@@ -2,8 +2,110 @@ from properties.p import Property
 from datetime import datetime
 import json
 from django.http import JsonResponse
+from api_handler_app.excel_read_class import *
+from properties.p import Property
+
+from xlrd import open_workbook
+
+prop=Property()
+propObj = prop.load_property_files('E:\\Investak\\investak.properties')
+
+
+wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
+sheet = wb.sheet_by_index(4)
+rows=sheet.nrows
+        #colmns=sheet.ncols
+
+inputParamDict = {}
+inputDict={}
+tempParamDict={}
+try:
+    for rownum in range(rows):
+    
+        if rownum==0:
+            continue
+        inputColHash= str(sheet.cell(rownum,0).value).strip()
+        apiName= str(sheet.cell(rownum,1).value).strip()
+        sno =  sheet.cell(rownum, 2).value
+        if isinstance(sno, float) and sno.is_integer():
+            sno = int(sno)
+        else:
+            sno = str(sno).strip()
+        parameter = str(sheet.cell(rownum, 3).value).strip()
+        description =(sheet.cell(rownum, 4).value).encode('utf-8').strip()
+        businessTag =  str(sheet.cell(rownum, 5).value).strip()
+        dataType = str(sheet.cell(rownum, 6).value).strip()
+        validValues = sheet.cell(rownum, 7).value
+        if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
+            validValues = int(validValues)
+        else:
+            validValues = str(validValues).strip()
+        print 'validValues',validValues
+        optional = str(sheet.cell(rownum, 8).value).strip()
+        default = sheet.cell(rownum, 9).value
+        if dataType!='Decimal' and isinstance(default, float) and default.is_integer():
+            default = int(default)
+        else:
+            default = str(default).strip()
+        print 'default',default
+        transformation = str(sheet.cell(rownum, 10).value).strip()
+        if dataType!='Decimal' and isinstance(transformation, float) and transformation.is_integer():
+            transformation = int(transformation)
+        else:
+            transformation = str(transformation).strip()
+        print 'transformation',transformation
+        investakScreenFieldSample = str(sheet.cell(rownum, 11).value).strip()
+        if apiName not in inputDict:
+            inputDict[apiName] = {}
+    
+        i=InputClass(inputColHash,apiName,sno,parameter,description,businessTag,dataType,validValues,optional,default,transformation,investakScreenFieldSample)
+        inputParamDict[parameter] = [i]
+        for k, v in inputDict.items():
+            if k.__contains__(apiName):
+                tempParamDict[parameter] =  inputParamDict[parameter]
+                inputDict[apiName].update({ parameter : tempParamDict[parameter]})
+
+except Exception as exception:
+    print 'exception',exception
+    raise exception
+
+
+
+
+
+
+
     
 import random
+#float: 100001408.0
+paramValue1='-0'
+paramValue1=int(paramValue1)
+paramValue1=abs(paramValue1)
+print paramValue1
+
+paramValue='-0.00'
+try:
+    splitNum=str(paramValue).split('.', 1)
+    if(str(paramValue).isdigit()):
+        pass
+    if (isinstance (json.loads (str(paramValue)), (float))):
+        pass
+    if str(splitNum[1]).isdigit():
+        pass
+    if str(abs(int(splitNum[0]))).isdigit ():
+        pass
+except Exception as e:
+    print e
+
+
+
+
+
+
+
+
+
+
 
 my_date=datetime.now ()
 r=int(my_date.toordinal() + 1721424.5)
