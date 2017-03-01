@@ -326,6 +326,14 @@ def get_login_2fa(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN")) 
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
+            contentType=request.content_type
+            if contentType:
+                if contentType==utilClass.read_property("CONTENT_TYPE"):
+                    pass
+                else:
+                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+            else:
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE")) 
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
@@ -449,6 +457,14 @@ def get_valid_pwd(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
+            contentType=request.content_type
+            if contentType:
+                if contentType==utilClass.read_property("CONTENT_TYPE"):
+                    pass
+                else:
+                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+            else:
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
@@ -572,6 +588,14 @@ def get_valid_ans(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
+            contentType=request.content_type
+            if contentType:
+                if contentType==utilClass.read_property("CONTENT_TYPE"):
+                    pass
+                else:
+                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+            else:
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
@@ -715,6 +739,14 @@ def get_api_handler_request(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
+            contentType=request.content_type
+            if contentType:
+                if contentType==utilClass.read_property("CONTENT_TYPE"):
+                    pass
+                else:
+                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+            else:
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId=utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True

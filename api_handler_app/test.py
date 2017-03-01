@@ -7,6 +7,24 @@ from properties.p import Property
 
 from xlrd import open_workbook
 
+
+yourString='        '
+if yourString.strip()=='':
+    print "yes"
+strippedString = yourString.strip()
+
+if strippedString=='':
+    print "yes"
+else:
+    print 'no'
+
+
+
+
+
+
+
+
 prop=Property()
 propObj = prop.load_property_files('E:\\Investak\\investak.properties')
 

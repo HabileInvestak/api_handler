@@ -49,7 +49,7 @@ LOGGING = {
         'default': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'E:\\Investak\\investak\\logger.log',  #Ranjith
+            'filename': 'E:\\Investak\\bugfix wrkspc\\logger.log',  #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\logger.log',  #Hari
            # 'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
@@ -58,7 +58,7 @@ LOGGING = {
         'request_handler': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'E:\\Investak\\investak\\django_request.log',    #Ranjith
+            'filename': 'E:\\Investak\\bugfix wrkspc\\django_request.log',    #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\django_request.log',  #Hari
             #'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,

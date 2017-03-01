@@ -246,6 +246,7 @@ class Validate():
         try:
             for paramTemp,paramValueTemp in paramValue.items():
                 errorMsgTemp=''
+                logger.debug(paramTemp)
                 logger.debug(paramValueTemp)
                 logger.debug(jsonDict.get(validValues).get(paramTemp)[0].dataType)
                 dataType=jsonDict.get(validValues).get(paramTemp)[0].dataType
@@ -1000,25 +1001,26 @@ class Validate():
                     for k1, v1 in v.items():
                         logger.debug(k1)
                         for v2 in v1:
-                            b = v2.parameter
+                            fieldParam = v2.parameter
                             #logger.debug("Parameter="+b)
                             #logger.debug(dictVar.get(b))
-                            optional= dictVar.get(ApiName).get(b)[0].optional
+                            optional= dictVar.get(ApiName).get(fieldParam)[0].optional
                             #logger.debug("optional====="+optional) 
                             if (optional == utilClass.read_property('YES')):
                                 #logger.debug("Yes="+b)
-                                if (b in expectList):
+                                if (fieldParam in expectList):
                                     #logger.debug("In expect list")
-                                    paramValue=content[b]
+                                    paramValue=content[fieldParam]
                                     #logger.debug(paramValue)
-                                    if utilClass.is_blank(paramValue) :
+                                    paramValue=paramValue.strip()
+                                    if not paramValue:
                                         if paramValue is not None:
-                                            arrayValue = [b]
+                                            arrayValue = [fieldParam]
                                             errorMsg = self.create_error_message (utilClass.read_property ("MANDATORY_FIELD"), arrayValue)
                                             if errorMsg:
                                                 errorList.append (errorMsg)
                                 else:
-                                    arrayValue = [b]
+                                    arrayValue = [fieldParam]
                                     errorMsg = self.create_error_message (utilClass.read_property ("MANDATORY_FIELD"), arrayValue)
                                     errorList.append(errorMsg)
                                     #logger.debug(errorList)
