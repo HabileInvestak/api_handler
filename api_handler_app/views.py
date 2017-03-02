@@ -54,7 +54,10 @@ def get_initial_token(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))
             url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
@@ -195,7 +198,10 @@ def get_login_mode(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_MODE"))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_MODE"))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))
             url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
@@ -308,7 +314,10 @@ def get_login_2fa(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_2FA"))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_2FA"))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
             apiName = utilClass.read_property ("LOGIN_2FA")
@@ -441,7 +450,10 @@ def get_valid_pwd(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property("VALID_PASSWORD"))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property("VALID_PASSWORD"))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
             apiName = utilClass.read_property("VALID_PASSWORD")
@@ -571,7 +583,10 @@ def get_valid_ans(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property("VALID_ANSWER"))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property("VALID_ANSWER"))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
             apiName = utilClass.read_property ("VALID_ANSWER")
@@ -722,7 +737,10 @@ def get_api_handler_request(request):
             except Exception:
                 raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            urlPath = apiHomeDict.get(utilClass.read_property(path_var))[0].url
+            try:
+                urlPath = apiHomeDict.get(utilClass.read_property(path_var))[0].url
+            except Exception:
+                raise ValueError(utilClass.read_property("INVALID_URL"))            
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
             ipAddress=utilClass.get_client_ip(request)

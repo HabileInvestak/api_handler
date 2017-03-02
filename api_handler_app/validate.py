@@ -1012,7 +1012,8 @@ class Validate():
                                     #logger.debug("In expect list")
                                     paramValue=content[fieldParam]
                                     #logger.debug(paramValue)
-                                    paramValue=paramValue.strip()
+                                    if paramValue is not None:
+                                        paramValue=paramValue.strip()
                                     if not paramValue:
                                         if paramValue is not None:
                                             arrayValue = [fieldParam]
