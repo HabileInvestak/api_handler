@@ -74,6 +74,7 @@ class ExcelSheetInput():
                 sno =  sheet.cell(rownum, 2).value
                 if isinstance(sno, float) and sno.is_integer():
                     sno = int(sno)
+                    sno = str(sno).strip()
                 else:
                     sno = str(sno).strip()
                 parameter = str(sheet.cell(rownum, 3).value).strip()
@@ -83,17 +84,20 @@ class ExcelSheetInput():
                 validValues = sheet.cell(rownum, 7).value
                 if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
                     validValues = int(validValues)
+                    validValues = str(validValues).strip()
                 else:
                     validValues = str(validValues).strip()
                 optional = str(sheet.cell(rownum, 8).value).strip()
                 default = sheet.cell(rownum, 9).value
                 if dataType!='Decimal' and isinstance(default, float) and default.is_integer():
                     default = int(default)
+                    default = str(default).strip()
                 else:
                     default = str(default).strip()
                 transformation = sheet.cell(rownum, 10).value
                 if dataType!='Decimal' and isinstance(transformation, float) and transformation.is_integer():
                     transformation = int(transformation)
+                    transformation = str(transformation).strip()
                 else:
                     transformation = str(transformation).strip()
                 investakScreenFieldSample = str(sheet.cell(rownum, 11).value).strip()
@@ -138,6 +142,7 @@ class ExcelSheetSuccess():
                 sno =  sheet.cell(rownum, 2).value
                 if isinstance(sno, float) and sno.is_integer():
                     sno = int(sno)
+                    sno = str(sno).strip()
                 else:
                     sno = str(sno).strip()
                 parameter = str(sheet.cell(rownum, 3).value).strip()
@@ -147,12 +152,14 @@ class ExcelSheetSuccess():
                 validValues =  sheet.cell(rownum, 7).value
                 if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
                     validValues = int(validValues)
+                    validValues = str(validValues).strip()
                 else:
                     validValues = str(validValues).strip()
                 optional =  str(sheet.cell(rownum, 8).value).strip()
                 transformation =  sheet.cell(rownum, 9).value
                 if dataType!='Decimal' and isinstance(transformation, float) and transformation.is_integer():
                     transformation = int(transformation)
+                    transformation = str(transformation).strip()
                 else:
                     transformation = str(transformation).strip()
                 specialProcess = str(sheet.cell(rownum, 10).value).strip()
@@ -197,6 +204,7 @@ class ExcelSheetFailure():
                 sno =sheet.cell(rownum, 2).value
                 if isinstance(sno, float) and sno.is_integer():
                     sno = int(sno)
+                    sno = str(sno).strip()
                 else:
                     sno = str(sno).strip()
                 parameter =  str(sheet.cell(rownum, 3).value).strip()
@@ -205,6 +213,7 @@ class ExcelSheetFailure():
                 validValues = sheet.cell(rownum, 6).value
                 if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
                     validValues = int(validValues)
+                    validValues = str(validValues).strip()
                 else:
                     validValues = str(validValues).strip()
                 
@@ -248,6 +257,7 @@ class ExcelSheetJson():
                 sno =  sheet.cell(rownum, 2).value
                 if isinstance(sno, float) and sno.is_integer():
                     sno = int(sno)
+                    sno = str(sno).strip()
                 else:
                     sno = str(sno).strip()
                 parameter =  str(sheet.cell(rownum, 3).value).strip()
@@ -256,6 +266,7 @@ class ExcelSheetJson():
                 validValues =  sheet.cell(rownum, 6).value
                 if dataType!='Decimal' and isinstance(validValues, float) and validValues.is_integer():
                     validValues = int(validValues)
+                    validValues = str(validValues).strip()
                 else:
                     validValues = str(validValues).strip()
                 
@@ -301,10 +312,21 @@ class ExcelSheetLists():
                 listNo =  sheet.cell(rownum, 2).value
                 if isinstance(listNo, float) and listNo.is_integer():
                     listNo = int(listNo)
+                    listNo = str(listNo).strip()
                 else:
                     listNo = str(listNo).strip()
-                sourceValue =  str(sheet.cell(rownum, 3).value).strip()
-                targetValue =  str(sheet.cell(rownum, 4).value).strip()
+                sourceValue =  sheet.cell(rownum, 3).value
+                if isinstance(sourceValue, float) and sourceValue.is_integer():
+                    sourceValue = int(sourceValue)
+                    sourceValue = str(sourceValue).strip()
+                else:
+                    sourceValue = (sourceValue)
+                targetValue =  sheet.cell(rownum, 4).value
+                if isinstance(targetValue, float) and targetValue.is_integer():
+                    targetValue = int(targetValue)
+                    targetValue = str(targetValue).strip()
+                else:
+                    targetValue = str(targetValue).strip()
                 dataType =  str(sheet.cell(rownum, 5).value).strip()
                 if listName not in listDict:
                     listDict[listName] = {}

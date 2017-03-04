@@ -1038,7 +1038,7 @@ class Validate():
                     logger.debug("param="+param)
                     logger.debug("dataType="+dataType)
                     validValues= dictVar.get(ApiName).get(param)[0].validValues
-                    logger.debug("validValues="+validValues)
+                    #logger.debug("validValues="+validValues)
                     if not dictVar==failureDict and not dictVar==jsonDict:
                         errorList=self.data_type_validation(dataType,value,param,validValues,ApiName,dictVar)
                         errorListAll.extend (errorList)
