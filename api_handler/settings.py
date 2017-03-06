@@ -28,8 +28,8 @@ SECRET_KEY = 'r9jclw5=vm%vj1$u!2i0oaye2qfz0!q5x*3endb&qu1_x!fod)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 APPEND_SLASH=False
-ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1']     #local
+#ALLOWED_HOSTS = ['52.43.99.16']  #Server
 '''#server
 DEBUG = True
 ALLOWED_HOSTS = []
@@ -49,7 +49,8 @@ LOGGING = {
         'default': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'E:\\Investak\\bugfix wrkspc\\logger.log',  #Ranjith
+            'filename': 'C:\\Users\\Administrator\\Documents\\Investak\\working code\\logger.log',  #Server
+           #'filename': 'E:\\Investak\\bugfix wrkspc\\logger.log',  #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\logger.log',  #Hari
            # 'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
@@ -58,7 +59,8 @@ LOGGING = {
         'request_handler': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': 'E:\\Investak\\bugfix wrkspc\\django_request.log',    #Ranjith
+            'filename': 'C:\\Users\\Administrator\\Documents\\Investak\\working code\\django_request.log',  #Server
+           #'filename': 'E:\\Investak\\bugfix wrkspc\\django_request.log',    #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\django_request.log',  #Hari
             #'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,

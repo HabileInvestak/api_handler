@@ -34,7 +34,8 @@ def get_initial_token(request):
     output=''
     requestId=''
     apiName=''
-    userId=""
+    userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -179,7 +180,8 @@ def get_login_mode(request):
     output=''
     requestId=''
     apiName=''
-    userId=""
+    userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -296,6 +298,7 @@ def get_login_2fa(request):
     requestId=''
     apiName=''
     userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -342,7 +345,7 @@ def get_login_2fa(request):
                 else:
                     raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             else:
-                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE")) 
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
@@ -432,6 +435,7 @@ def get_valid_pwd(request):
     requestId=''
     apiName=''
     userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -565,6 +569,7 @@ def get_valid_ans(request):
     requestId=''
     apiName=''
     userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
@@ -717,6 +722,7 @@ def get_api_handler_request(request):
     requestId=''
     apiName=''
     userId=''
+    sourceUrl=''
     dictionary={}
     returnAllDict = ReturnAllDict()
     allList = returnAllDict.return_dict()
