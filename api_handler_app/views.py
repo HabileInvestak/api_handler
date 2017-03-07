@@ -46,39 +46,23 @@ def get_initial_token(request):
     systemDict=allList[7]
     try:
         if request.method == utilClass.read_property("METHOD_TYPE"): 
-            #print sourceUrl
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict) 
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property("GET_INITIAL_KEY"))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))
+            apiName = utilClass.read_property ("GET_INITIAL_KEY")
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)
             url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
-            apiName = utilClass.read_property ("GET_INITIAL_KEY")
             authorization = request.META.get(utilClass.read_property("AUTHORIZATION"))
             '''Store InvestAK request for audit trial purpose'''
             requestId = utilClass.generate_request_id("ANAN",apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             '''This method will check input availability and input format'''
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
@@ -195,36 +179,20 @@ def get_login_mode(request):
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict)
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_MODE"))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))
+            apiName = utilClass.read_property ("LOGIN_MODE")
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)
             url=targetUrlDomain+''+urlPath
             bodyContent = request.body
             ipAddress=utilClass.get_client_ip(request)
-            apiName = utilClass.read_property ("LOGIN_MODE")
             authorization = request.META.get(utilClass.read_property("AUTHORIZATION"))
-           
             '''Store InvestAK request for audit trial purpose'''
             requestId = utilClass.generate_request_id("ANAN",apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             '''This method will check input availability and input format'''
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
@@ -312,18 +280,12 @@ def get_login_2fa(request):
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict)
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property("LOGIN_2FA"))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))
+            apiName = utilClass.read_property ("LOGIN_2FA")
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            apiName = utilClass.read_property ("LOGIN_2FA")
             bodyContent = request.body
             logger.debug("userJSON="+bodyContent)
             logger.debug("requestId before input availability and format="+str(requestId))
@@ -338,30 +300,15 @@ def get_login_2fa(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN")) 
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            contentType=request.content_type
-            if contentType:
-                if contentType==utilClass.read_property("CONTENT_TYPE"):
-                    pass
-                else:
-                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            contentType=request.content_type
+            validate.content_type(contentType)
             logger.debug("userId="+userId)
             jKey = requestObj.get_jkey(publicKey3Pem)
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             logger.debug("result="+str(result))
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
@@ -449,18 +396,12 @@ def get_valid_pwd(request):
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict)
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property("VALID_PASSWORD"))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))
+            apiName = utilClass.read_property("VALID_PASSWORD")
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            apiName = utilClass.read_property("VALID_PASSWORD")
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
             if authorization:
@@ -473,29 +414,14 @@ def get_valid_pwd(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            contentType=request.content_type
-            if contentType:
-                if contentType==utilClass.read_property("CONTENT_TYPE"):
-                    pass
-                else:
-                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            contentType=request.content_type
+            validate.content_type(contentType)
             jKey = requestObj.get_jkey(publicKey3Pem)
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
@@ -583,18 +509,12 @@ def get_valid_ans(request):
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict)
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property("VALID_ANSWER"))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))
+            apiName = utilClass.read_property ("VALID_ANSWER")
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
-            apiName = utilClass.read_property ("VALID_ANSWER")
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
             if authorization:
@@ -608,29 +528,14 @@ def get_valid_ans(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            contentType=request.content_type
-            if contentType:
-                if contentType==utilClass.read_property("CONTENT_TYPE"):
-                    pass
-                else:
-                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId = utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            contentType=request.content_type
+            validate.content_type(contentType)
             jKey = requestObj.get_jkey(publicKey3Pem)
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))
@@ -738,19 +643,13 @@ def get_api_handler_request(request):
             httpScheme= request.scheme               # http or https
             domainName= request.META['HTTP_HOST']
             requestUrl=httpScheme+'://'+domainName+'/'
-            try:
-                sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_SOURCE_URL")) 
+            sourceUrl=validate.get_source_url(requestUrl,systemDict)
             targetUrlDomain=systemDict.get(sourceUrl)[0].targetUrl
-            try:
-                urlPath = apiHomeDict.get(utilClass.read_property(path_var))[0].url
-            except Exception:
-                raise ValueError(utilClass.read_property("INVALID_URL"))            
+            apiName=utilClass.read_property(path_var)
+            urlPath =validate.get_target_url_path(apiHomeDict,apiName)    
             url=targetUrlDomain+''+urlPath
             ipAddress=utilClass.get_client_ip(request)
             ipAddress=utilClass.get_client_ip(request)
-            apiName=utilClass.read_property(path_var)
             bodyContent = request.body
             authorization = request.META.get(utilClass.read_property('AUTHORIZATION'))
             if authorization:
@@ -763,29 +662,14 @@ def get_api_handler_request(request):
                     raise ValueError(utilClass.read_property("INVALID_TOKEN"))
             else:
                 raise ValueError(utilClass.read_property("INVALID_TOKEN"))
-            contentType=request.content_type
-            if contentType:
-                if contentType==utilClass.read_property("CONTENT_TYPE"):
-                    pass
-                else:
-                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
-            else:
-                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
             requestId=utilClass.generate_request_id(userId,apiName)
             investakReqThread = Thread(target = auditTrial.investak_request_audit , args=(userId, bodyContent, apiName,apiHomeDict,ipAddress,requestId,systemDict,sourceUrl))
             investakReqThread.daemon = True
             investakReqThread.start()
+            contentType=request.content_type
+            validate.content_type(contentType)
             jKey = requestObj.get_jkey(publicKey4Pem)
-            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
-            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
-                pass
-            else:
-                pass
-            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
-            if fieldSeperator:
-                pass
-            else:
-                pass
+            validate.record_and_field_separator(systemDict,sourceUrl)
             result = validate.chk_input_availability_and_format (bodyContent, apiName, apiHomeDict,sourceUrl)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 apiResThread = Thread(target = auditTrial.api_response_audit , args=(requestId, result, apiName,apiHomeDict,userId,systemDict,sourceUrl))

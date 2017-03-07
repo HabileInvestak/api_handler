@@ -1492,3 +1492,66 @@ class Validate():
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
         return result
+    
+    
+    '''This method is used to get source Url from System Sheet.the source Url and Request Url is mismatched the error is shown'''
+    def get_source_url(self,requestUrl,systemDict):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        sourceUrl=''
+        try:    
+            sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
+        except Exception:
+            raise ValueError(utilClass.read_property("INVALID_SOURCE_URL"))     
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
+        return sourceUrl
+    
+   
+    '''This method is used to get target Url path from Api Sheet.'''
+    def get_target_url_path(self,apiHomeDict,apiName):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        urlPath=''
+        try:    
+            urlPath = apiHomeDict.get(apiName)[0].url
+        except Exception:
+            raise ValueError(utilClass.read_property("INVALID_URL"))  
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
+        return urlPath
+    
+    
+    '''This method is used to validate record and field separator.'''
+    def record_and_field_separator(self,systemDict,sourceUrl):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            recordSeperator=systemDict.get(sourceUrl)[0].recordSeperator
+            if recordSeperator and recordSeperator==utilClass.read_property("CR/LF"):
+                pass
+            else:
+                pass
+            fieldSeperator=systemDict.get(sourceUrl)[0].fieldSeperator
+            if fieldSeperator:
+                pass
+            else:
+                pass
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
+        
+        
+    '''This method is used to validate content type is application/json or not.'''
+    def content_type(self,contentType):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            if contentType:
+                if contentType==utilClass.read_property("CONTENT_TYPE"):
+                    pass
+                else:
+                    raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+            else:
+                raise ValueError(utilClass.read_property("INVALID_CONTENT_TYPE"))
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
