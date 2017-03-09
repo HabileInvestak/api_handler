@@ -21,9 +21,10 @@ class AuditTrial():
             logger.debug("Before Investak API audit enable")
             logger.debug("Logging="+logging)
             loggingSystem =systemDict.get(sourceUrl)[0].loggingRequired
+            source_request_status = utilClass.read_property('SUCCESS')
             if(loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                 logger.debug("Investak API audit enable")
-                auditobj=Audit(user_id=userId, investak_request=bodyContent,investak_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId)
+                auditobj=Audit(user_id=userId, source_request=bodyContent,source_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId,source_request_status=source_request_status)
                 auditobj.save()
                 logger.debug("requestId="+str(requestId))
         except Exception as exception:
@@ -40,13 +41,14 @@ class AuditTrial():
             dateNow = datetime.now ()
             logging=apiHomeDict.get(apiName)[0].logging
             loggingSystem=systemDict.get(sourceUrl)[0].loggingRequired
+            targetTransmitStatus = utilClass.read_property('SUCCESS')
             if(loggingSystem == utilClass.read_property ("YES") and logging==utilClass.read_property("YES") and utilClass.read_property('API_TSO_AUDIT_ENABLE')==utilClass.read_property("YES") and utilClass.read_property('INVESTAK_API_AUDIT_ENABLE')==utilClass.read_property("YES")):
                 Audit.objects.update_or_create (
                     request_id=requestId,
-                    defaults={utilClass.read_property('API_REQUEST'): request,utilClass.read_property('API_REQUEST_TIME_STAMP'):dateNow,utilClass.read_property('USER_ID'):userId},
+                    defaults={utilClass.read_property('TARGET_TRANSMIT'): request,utilClass.read_property('TARGET_TRANSMIT_TIME_STAMP'):dateNow,utilClass.read_property('USER_ID'):userId,utilClass.read_property('TARGET_TRANSMIT_STATUS'):targetTransmitStatus},
                 )
             elif(loggingSystem == utilClass.read_property ("YES")):
-                auditobj = Audit (user_id=userId, api_request=request, api_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId)
+                auditobj = Audit (user_id=userId, target_transmit=request, target_transmit_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId,target_transmit_status=targetTransmitStatus)
                 auditobj.save ()
         except Exception as exception:
             raise exception
@@ -58,6 +60,7 @@ class AuditTrial():
     def api_response_audit(self,requestId,request,apiName,apiHomeDict,userId,systemDict,sourceUrl):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
+        sourceTransmitStatus = ''
         try:
             dateNow = datetime.now ()
             logging = apiHomeDict.get(apiName)[0].logging
@@ -67,28 +70,28 @@ class AuditTrial():
                     print dict_var
                     stat=dict_var.get(utilClass.read_property('STATUS'))
                     if stat == utilClass.read_property ('OK'):
-                        apiStatus = utilClass.read_property('SUCCESS')
+                        sourceTransmitStatus = utilClass.read_property('SUCCESS')
                         pass
                     else:
-                        apiStatus = utilClass.read_property('FAILURE')
+                        sourceTransmitStatus = utilClass.read_property('FAILURE')
                         break
                 if (loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.read_property('API_RESPONSE'): request,utilClass.read_property('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('API_STATUS'):apiStatus,utilClass.read_property('USER_ID'):userId},
+                        defaults={utilClass.read_property('SOURCE_TRANSMIT'): request,utilClass.read_property('SOURCE_TRANSMIT_TIME_STAMP'):dateNow,utilClass.read_property('SOURCE_TRANSMIT_STATUS'):sourceTransmitStatus,utilClass.read_property('USER_ID'):userId},
                     ) 
             else:          
                 stat= request.get (utilClass.read_property('STATUS'))
                 if stat== utilClass.read_property ('OK'):
-                    apiStatus=utilClass.read_property ('SUCCESS')
+                    sourceTransmitStatus=utilClass.read_property ('SUCCESS')
                 elif stat == utilClass.read_property ('NOT_OK'):
-                    apiStatus = utilClass.read_property ('FAILURE')
+                    sourceTransmitStatus = utilClass.read_property ('FAILURE')
                 else:
-                    apiStatus = utilClass.read_property ('SUCCESS')
+                    sourceTransmitStatus = utilClass.read_property ('SUCCESS')
                 if (loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.read_property('API_RESPONSE'): request,utilClass.read_property('API_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('API_STATUS'):apiStatus,utilClass.read_property('USER_ID'):userId},
+                        defaults={utilClass.read_property('SOURCE_TRANSMIT'): request,utilClass.read_property('SOURCE_TRANSMIT_TIME_STAMP'):dateNow,utilClass.read_property('SOURCE_TRANSMIT_STATUS'):sourceTransmitStatus,utilClass.read_property('USER_ID'):userId},
                     )
             logger.info(utilClass.read_property("EXITING_METHOD"))
         except Exception as exception:
@@ -100,7 +103,7 @@ class AuditTrial():
     def tso_response_audit(self,requestId,request,apiName,apiHomeDict,successDict,failureDict,systemDict,sourceUrl):
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
-        tsoStatus=''
+        targetResponseStatus=''
         try:
             dateNow = datetime.now ()
             #find json array
@@ -110,30 +113,30 @@ class AuditTrial():
                 for dict_var in request:
                     stat=dict_var.get(utilClass.read_property('STATUS'))
                     if stat == utilClass.read_property ('OK'):
-                        tsoStatus = utilClass.read_property('SUCCESS')
+                        targetResponseStatus = utilClass.read_property('SUCCESS')
                         pass
                     else:
-                        tsoStatus = utilClass.read_property('FAILURE')
+                        targetResponseStatus = utilClass.read_property('FAILURE')
                         break
                 if (loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.read_property('TSO_RESPONSE'): request,utilClass.read_property('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TSO_STATUS'):tsoStatus},
+                        defaults={utilClass.read_property('TARGET_RESPONSE'): request,utilClass.read_property('TARGET_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TARGET_RESPONSE_STATUS'):targetResponseStatus},
                     )    
             else:
                 stat = request.get(utilClass.read_property('STATUS'))
                 if stat == utilClass.read_property ('OK'):
-                    tsoStatus = utilClass.read_property('SUCCESS')
+                    targetResponseStatus = utilClass.read_property('SUCCESS')
                 elif stat == utilClass.read_property ('NOT_OK'):
-                    tsoStatus = utilClass.read_property('FAILURE')
+                    targetResponseStatus = utilClass.read_property('FAILURE')
                 else:
-                    tsoStatus=utilClass.read_property('SUCCESS')
+                    targetResponseStatus=utilClass.read_property('SUCCESS')
                 logger.debug(apiName)
                 logging = apiHomeDict.get(apiName)[0].logging
                 if (loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                     Audit.objects.update_or_create (
                         request_id=requestId,
-                        defaults={utilClass.read_property('TSO_RESPONSE'): request,utilClass.read_property('TSO_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TSO_STATUS'):tsoStatus},
+                        defaults={utilClass.read_property('TARGET_RESPONSE'): request,utilClass.read_property('TARGET_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TARGET_RESPONSE_STATUS'):targetResponseStatus},
                     )
         except Exception as exception:
             raise exception

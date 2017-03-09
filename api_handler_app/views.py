@@ -750,7 +750,10 @@ def get_retrieve_all_pending_api(request):
     validate=Validate()
     try:
         if request.method == utilClass.read_property ('METHOD_TYPE'):
-            audit = Audit.objects.filter(Q(api_status="") | Q(tso_status=""))
+            audit = Audit.objects.filter(
+                Q(target_transmit_status="S"),#Q(source_request_status="S") & 
+                Q(source_transmit_status="") | Q(target_response_status="")
+                )
             serializer = AuditSerializer(audit, many=True)
             return Response(serializer.data) 
     except Exception as exception:
@@ -773,9 +776,9 @@ def get_retrieve_all_success_or_failure_api(request):
             jsonObject = json.loads (bodyContent)
             status=str(jsonObject.get("status"))
             if status==utilClass.read_property ('SUCCESS'):
-                audit = Audit.objects.filter(api_status=status,tso_status=status)
+                audit = Audit.objects.filter(source_request_status=status,target_transmit_status=status,target_response_status=status,source_transmit_status=status,)
             if status==utilClass.read_property ('FAILURE'):
-                audit = Audit.objects.filter(Q(api_status=status) | Q(tso_status=status))
+                audit = Audit.objects.filter(Q(source_transmit_status=status) | Q(target_response_status=status))
             serializer = AuditSerializer(audit, many=True)
             return Response(serializer.data) 
     except Exception as exception:
