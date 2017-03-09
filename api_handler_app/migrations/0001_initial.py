@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('user_id', models.TextField()),
                 ('api_name', models.TextField()),
-                ('request_id', models.TextField(unique=True, serialize=False, primary_key=True)),
+                ('request_id', models.AutoField(unique=True, serialize=False, primary_key=True)),
                 ('source_request_time_stamp', models.DateTimeField(null=True)),
                 ('request_validate_time_stamp', models.DateTimeField(null=True)),
                 ('target_transmit_time_stamp', models.DateTimeField(null=True)),

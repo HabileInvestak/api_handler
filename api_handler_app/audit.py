@@ -1,6 +1,8 @@
 from datetime import datetime
 import logging
+
 from api_handler_app.models import Audit
+from api_handler_app.return_all_dict import ReturnAllDict
 from utils import UtilClass
 
 
@@ -21,10 +23,10 @@ class AuditTrial():
             logger.debug("Before Investak API audit enable")
             logger.debug("Logging="+logging)
             loggingSystem =systemDict.get(sourceUrl)[0].loggingRequired
-            source_request_status = utilClass.read_property('SUCCESS')
+            sourceRequestStatus = utilClass.read_property('SUCCESS')
             if(loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
                 logger.debug("Investak API audit enable")
-                auditobj=Audit(user_id=userId, source_request=bodyContent,source_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId,source_request_status=source_request_status)
+                auditobj=Audit(user_id=userId, source_request=bodyContent,source_request_time_stamp=dateNow,api_name=apiName,ip_address=ipAddress,request_id=requestId,source_request_status=sourceRequestStatus)
                 auditobj.save()
                 logger.debug("requestId="+str(requestId))
         except Exception as exception:
@@ -138,6 +140,65 @@ class AuditTrial():
                         request_id=requestId,
                         defaults={utilClass.read_property('TARGET_RESPONSE'): request,utilClass.read_property('TARGET_RESPONSE_TIME_STAMP'):dateNow,utilClass.read_property('TARGET_RESPONSE_STATUS'):targetResponseStatus},
                     )
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))
+        
+        
+    def all_request_response_audit(self,sourceUrl,userId,apiName,sourceRequestTimeStamp,requestValidateTimeStamp,
+                                   targetTransmitTimeStamp,targetResponseTimeStamp,responseValidateTimeStamp,
+                                   sourceTransmitTimeStamp,sourceRequest,targetTransmit,targetResponse,sourceTransmit,
+                                   sourceRequestStatus,targetTransmitStatus,targetResponseStatus,sourceTransmitStatus,
+                                   ipAddress):
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
+        returnAllDict = ReturnAllDict()
+        allList = returnAllDict.return_dict()
+        apiHomeDict = allList[0]
+        systemDict = allList[7]
+        try:
+            logging = apiHomeDict.get(apiName)[0].logging
+            logger.debug("ALL API audit")
+            logger.debug("Logging="+logging)
+            loggingSystem =systemDict.get(sourceUrl)[0].loggingRequired
+            if(loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
+                logger.debug("Investak API audit enable")
+                auditobj=Audit(user_id=userId,api_name=apiName,source_request_time_stamp=sourceRequestTimeStamp,request_validate_time_stamp=requestValidateTimeStamp,
+                               target_transmit_time_stamp=targetTransmitTimeStamp,target_response_time_stamp=targetResponseTimeStamp,response_validate_time_stamp=responseValidateTimeStamp,
+                               source_transmit_time_stamp=sourceTransmitTimeStamp,source_request=sourceRequest,target_transmit=targetTransmit,
+                               target_response=targetResponse,source_transmit=sourceTransmit,source_request_status=sourceRequestStatus
+                               ,target_transmit_status=targetTransmitStatus,target_response_status=targetResponseStatus,
+                               source_transmit_status=sourceTransmitStatus,ip_address=ipAddress)
+                auditobj.save()
+                requestId=auditobj.request_id
+                logger.debug("requestId="+str(requestId))
+                print 'requestId',requestId
+            elif(utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("NO") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("NO")):
+                pass
+            elif(loggingSystem == utilClass.read_property ("YES") and logging == utilClass.read_property ("YES")):
+                if(utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("NO") and utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("YES")):
+                    auditobj=Audit(user_id=userId,api_name=apiName,request_validate_time_stamp=requestValidateTimeStamp,
+                           target_transmit_time_stamp=targetTransmitTimeStamp,target_response_time_stamp=targetResponseTimeStamp,response_validate_time_stamp=responseValidateTimeStamp,
+                           target_transmit=targetTransmit,target_response=targetResponse,
+                           target_transmit_status=targetTransmitStatus,
+                           target_response_status=targetResponseStatus,
+                           ip_address=ipAddress)
+                    auditobj.save()
+                    requestId=auditobj.request_id
+                    logger.debug("requestId="+str(requestId))
+                    print 'requestId',requestId
+                
+                elif(utilClass.read_property ('API_TSO_AUDIT_ENABLE') == utilClass.read_property ("NO") and utilClass.read_property ('INVESTAK_API_AUDIT_ENABLE') == utilClass.read_property ("YES")):
+                    auditobj=Audit(user_id=userId,api_name=apiName,source_request_time_stamp=sourceRequestTimeStamp,request_validate_time_stamp=requestValidateTimeStamp,
+                           response_validate_time_stamp=responseValidateTimeStamp,
+                           source_transmit_time_stamp=sourceTransmitTimeStamp,source_request=sourceRequest,
+                           source_transmit=sourceTransmit,source_request_status=sourceRequestStatus
+                           ,source_transmit_status=sourceTransmitStatus,ip_address=ipAddress)
+                auditobj.save()
+                requestId=auditobj.request_id
+                logger.debug("requestId="+str(requestId))
+                print 'requestId',requestId
+                
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))

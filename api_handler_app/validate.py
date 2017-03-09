@@ -1555,3 +1555,61 @@ class Validate():
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))  
+        
+    
+    '''This method is used to get tso response status.'''
+    def get_target_response_status(self,request):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            if type(request) is list:
+                for dict_var in request:
+                    stat=dict_var.get(utilClass.read_property('STATUS'))
+                    if stat == utilClass.read_property ('OK'):
+                        targetResponseStatus = utilClass.read_property('SUCCESS')
+                        pass
+                    else:
+                        targetResponseStatus = utilClass.read_property('FAILURE')
+                        break
+            else:
+                stat = request.get(utilClass.read_property('STATUS'))
+                if stat == utilClass.read_property ('OK'):
+                    targetResponseStatus = utilClass.read_property('SUCCESS')
+                elif stat == utilClass.read_property ('NOT_OK'):
+                    targetResponseStatus = utilClass.read_property('FAILURE')
+                else:
+                    targetResponseStatus=utilClass.read_property('SUCCESS')
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
+        return targetResponseStatus
+    
+    
+    
+    '''This method is used to get api response status.'''
+    def get_source_transmit_status(self,request):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            if type(request) is list:
+                for dict_var in request:
+                    print dict_var
+                    stat=dict_var.get(utilClass.read_property('STATUS'))
+                    if stat == utilClass.read_property ('OK'):
+                        sourceTransmitStatus = utilClass.read_property('SUCCESS')
+                        pass
+                    else:
+                        sourceTransmitStatus = utilClass.read_property('FAILURE')
+                        break
+            else:          
+                stat= request.get (utilClass.read_property('STATUS'))
+                if stat== utilClass.read_property ('OK'):
+                    sourceTransmitStatus=utilClass.read_property ('SUCCESS')
+                elif stat == utilClass.read_property ('NOT_OK'):
+                    sourceTransmitStatus = utilClass.read_property ('FAILURE')
+                else:
+                    sourceTransmitStatus = utilClass.read_property ('SUCCESS')
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))  
+        return sourceTransmitStatus
