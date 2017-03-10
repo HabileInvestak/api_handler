@@ -1,4 +1,4 @@
-# Create your tests here.
+"""# Create your tests here.
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,9 +19,8 @@ import time
 from Crypto.PublicKey import RSA
 from Crypto import Random
 from Crypto.Cipher import PKCS1_v1_5
-from rest_example.wsgi import ReturnAllDict
-from restapp.models import Audit
-
+from api_handler_app.return_all_dict import ReturnAllDict
+from api_handler_app.models import Audit
 e = ReturnAllDict()
 AllList = e.returnDict()
 ApiHomeDict = AllList[0]
@@ -2618,4 +2617,4 @@ def sendResponse(e):
     errorList.append(errorMsg)
     response_data=sendErrorRequesterror(errorList,stat)
     logger.info(readProperty('113'))  
-    return response_data    
+    return response_data    """

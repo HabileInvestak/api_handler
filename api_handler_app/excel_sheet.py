@@ -12,6 +12,7 @@ class ExcelSheetApi():
     and stored as a api dictionary with apiName is key and remaining column is value'''
     def api_home_dict(self,propObj):  
         logger.info(propObj.get("ENTERING_METHOD"))
+        #wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"),Password='12345')
         wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
         sheet = wb.sheet_by_index(2)
         rows=sheet.nrows

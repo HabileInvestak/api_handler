@@ -8,6 +8,7 @@ from api_handler_app.return_all_dict import ReturnAllDict
 from utils import UtilClass
 
 
+
 logger = logging.getLogger('api_handler_app.validate.py')
 
 '''This class used to  validation and manipulation of All api Values'''
@@ -893,11 +894,13 @@ class Validate():
         #print dict.get(ApiName).get(ApiName)[0].parameter
         errorList=[]
         expectList=[]
+        invalidDict={}
         expectMsg=''
         returnAllDict = ReturnAllDict()
         allList = returnAllDict.return_dict()
         inputDict = allList[1]
         jsonDict = allList[4]
+        successDict = allList[2]
         try:
             for k, v in dictVar.items():
                 if k == ApiName:
@@ -916,19 +919,22 @@ class Validate():
                 errorList.append (expectMsg)
             if not errorList:
                 print "content==================",content
-                for param, v in content.items():
+                for param, value in content.items():
                     if (param in expectList):
                         pass
                     else:
-                        arrayValue = [param]
-                        errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
-                        errorList.append(errorMsg)
+                        if(dictVar==successDict):
+                            invalidDict[param]=value
+                        else:
+                            arrayValue = [param]
+                            errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
+                            errorList.append(errorMsg)
             if errorList:
                 isErrorAvailable = True
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return isErrorAvailable,errorList
+        return isErrorAvailable,errorList,invalidDict
     
     
     '''This method will check the input for availability and format
@@ -994,6 +1000,8 @@ class Validate():
             logger.debug("check_all_validate=====")
             #logger.debug("ApiName"+ApiName)
             for param, v in content.items():
+                if param==utilClass.read_property('WARNING_LIST'):
+                        continue
                 expectList.append(param)
             #logger.debug(expectList)
             for k, v in dictVar.items():
@@ -1032,6 +1040,8 @@ class Validate():
                 logger.debug(content) 
                 print 'content',content         
                 for param, value in content.items():
+                    if param==utilClass.read_property('WARNING_LIST'):
+                        continue
                     a=a+1
                     logger.debug(a)
                     dataType= dictVar.get(ApiName).get(param)[0].dataType
@@ -1161,7 +1171,9 @@ class Validate():
                         dictVar=failureDict
                     if(dictVar==inputDict and inputValidation==utilClass.read_property("YES")):
                         logger.debug("Validation parameter")
-                        result = self.validation_parameter (response, apiName, dictVar)
+                        results = self.validation_parameter (response, apiName, dictVar)
+                        result=results[0]
+                        response=results[1]
                         if not result:
                             logger.debug("After manipulation_default")
                             response = self.manipulation_default (response, apiName, dictVar)
@@ -1176,7 +1188,9 @@ class Validate():
                             resultAll.append(result)    
                     elif(dictVar==successDict and responseValidation==utilClass.read_property("YES")):
                         logger.debug("INSIDE SUCCESS")
-                        result = self.validation_parameter (response, apiName, dictVar)
+                        results = self.validation_parameter (response, apiName, dictVar)
+                        result=results[0]
+                        response=results[1]
                         logger.debug(result)
                         if not result:
                             logger.debug("After validation_all in success")
@@ -1200,16 +1214,19 @@ class Validate():
                 return resultAll       
             else:            # it is a dictionary
                 stat = jsonObject.get(utilClass.read_property('STATUS'))
+                stat=str(stat)
                 if not dictVar==inputDict:
                     if stat == utilClass.read_property ('OK'):
                         dictVar=successDict
-                    elif stat == utilClass.read_property ('NOT_OK'):
+                    elif stat == utilClass.read_property ('NOT_OK') or stat == utilClass.read_property ('NONE'):
                         dictVar=failureDict
                     else:
                         dictVar=successDict
                 if(dictVar==inputDict and inputValidation==utilClass.read_property("YES")):
                     logger.debug("Validation parameter")
-                    result = self.validation_parameter (jsonObject, apiName, dictVar)
+                    results = self.validation_parameter (jsonObject, apiName, dictVar)
+                    result=results[0]
+                    jsonObject=results[1]
                     if not result:
                         logger.debug("After manipulation_default")
                         jsonObject = self.manipulation_default (jsonObject, apiName, dictVar)
@@ -1222,7 +1239,9 @@ class Validate():
                         logger.debug("result="+str(result))
                 elif(dictVar==successDict and responseValidation==utilClass.read_property("YES")):
                     logger.debug("INSIDE SUCCESS")
-                    result = self.validation_parameter (jsonObject, apiName, dictVar)
+                    results = self.validation_parameter (jsonObject, apiName, dictVar)
+                    result=results[0]
+                    jsonObject=results[1]
                     logger.debug(result)
                     if not result:
                         logger.debug("After validation_all in success")
@@ -1263,6 +1282,8 @@ class Validate():
         try:
             if jsonObject and  not dictVar==failureDict and not dictVar==jsonDict:
                 for param, value in jsonObject.items():
+                    if param==utilClass.read_property('WARNING_LIST'):
+                        continue
                     dataType=dictVar.get(apiName).get(param)[0].dataType
                     transformation= dictVar.get(apiName).get(param)[0].transformation
                     if not dataType=='JSON':
@@ -1307,6 +1328,8 @@ class Validate():
         try:
             if jsonObject and dictVar==inputDict:
                 for param, value in jsonObject.items():
+                    if param==utilClass.read_property('WARNING_LIST'):
+                        continue
                     default= dictVar.get(apiName).get(param)[0].default
                     value = self.default_validation (default, value)
                     jsonObject[param]=value
@@ -1376,17 +1399,38 @@ class Validate():
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         result = {}
+        results = []
         try:
             if jsonObject:
                 param = self.validate_length_and_invalid_field (jsonObject, apiName, dictVar)
                 isErrorAvailable = param[0]
                 errorList = param[1]
+                invalidDict = param[2]
+                if invalidDict:
+                    jsonObject=self.remove_parameter_and_add_warning_list(jsonObject,invalidDict)
                 if (isErrorAvailable == True):
                     result = self.errorResponse (errorList, utilClass.read_property("NOT_OK"))
+                results.append(result)
+                results.append(jsonObject)
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))        
-        return  result
+        return results
+    
+    '''This method used to remove  key, value from success response.and add warning dictionary as success response.'''
+    def remove_parameter_and_add_warning_list(self,jsonObject,invalidDict):
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))
+        try:
+            for k,v in invalidDict.items():
+                del jsonObject[k]
+            print jsonObject
+            jsonObject['warningList']=invalidDict
+            print jsonObject
+        except Exception as exception:
+            raise exception
+        logger.info(utilClass.read_property("EXITING_METHOD"))        
+        return jsonObject
     
     
     '''This method used to check all validation and validation all method is called.

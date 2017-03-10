@@ -7,6 +7,48 @@ from properties.p import Property
 
 from xlrd import open_workbook
 
+from xlrd import *
+import win32com.client
+import csv
+import sys
+
+try:
+    xlApp = win32com.client.Dispatch("Excel.Application")
+    print "Excel library version:", xlApp.Version
+    filename,password = r"E:\\Investak\\Habile_Investak_API_Dictionary_Local.xlsx", '12345'
+    xlwb = xlApp.Workbooks.Open(filename, False, True, None,Password=password)
+    for sheet in xlwb.Worksheets:
+        print sheet
+    sheet = xlwb.Worksheets("API")
+    rows=sheet.nrows
+except Exception as e:
+    print e
+
+
+output={
+    u"Status": u"cancelled",
+    u"stat": u"Ok",
+    u"Nstordno": u"170309000000064",
+    u"Exchange": u"BSE",
+    u"Symbol": u"500410",
+    u"ExchSeg": u"bse_cm",
+    u"Trsym": u"ACC"
+  }
+invalidList = {u"Status": u"cancelled",u"stat": u"Ok",}
+
+#{u'stat': u'Not_Ok', u'emsg': u'API ERROR , ErrorCode : Session Expired'}
+for k,v in invalidList.items():
+    del output[k]
+print output
+output['warningList']=invalidList
+print output
+
+"""for inv in invalidList:
+    #output.setdefault('Warning List') , [])
+    output.setdefault('Warning List', [])
+    output['Warning List'].append(inv)"""
+    
+
 
 yourString='        '
 if yourString.strip()=='':
