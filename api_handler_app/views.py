@@ -774,9 +774,8 @@ def get_valid_ans(request):
             targetTransmit=result
             targetTransmitStatus=utilClass.read_property ('SUCCESS')
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
-            stat = output.get (utilClass.read_property ('STATUS'))
-            
-            encryptedData=output["jEncResp"]
+            validate.get_session_expired_response(output)
+            encryptedData=output[utilClass.read_property("JENCRESP")]
             privateKey2 = requestObj.import_key(privateKey2Pem)
             encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
             if(utilClass.read_property('RSA')==encryptionMethod):
@@ -793,6 +792,7 @@ def get_valid_ans(request):
             targetResponseTimeStamp=datetime.now ()
             targetResponse=decryptedJson
             targetResponseStatus=validate.get_target_response_status(decryptedJson)
+            stat = decryptedJson.get (utilClass.read_property ('STATUS'))
             if decryptedJson[utilClass.read_property('STATUS')]==utilClass.read_property('OK'):
                 accessToken = utilClass.replace_text(requestObj.b64_encode(privateKey2Pem), "\n", "") + "-" \
                                + utilClass.replace_text(requestObj.b64_encode(decryptedJson["sUserToken"]), "\n", "") + "-" \
@@ -959,6 +959,7 @@ def get_api_handler_request(request):
             output = requestObj.send_request(bodyContent, url, authorization, userId, tomcatCount, jKey, jData)
             print 'output ',output
             targetResponseTimeStamp=datetime.now ()
+            output=validate.invalid_data_account_info(output,apiName)
             targetResponse=output
             targetResponseStatus=validate.get_target_response_status(output)
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit

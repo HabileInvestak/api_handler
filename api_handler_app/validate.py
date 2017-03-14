@@ -993,23 +993,28 @@ class Validate():
         returnAllDict = ReturnAllDict()
         expectList=[]
         allList = returnAllDict.return_dict()
+        inputDict=allList[1]
         failureDict = allList[3]
         jsonDict = allList[4]
         try:
             a=0
             logger.debug("check_all_validate=====")
             #logger.debug("ApiName"+ApiName)
-            for param, v in content.items():
+            for param, value in content.items():
+                if dictVar==inputDict:
+                    stripValue=value.strip()
+                    content[param]=stripValue
                 if param==utilClass.read_property('WARNING_LIST'):
                         continue
                 expectList.append(param)
+            print content
             #logger.debug(expectList)
-            for k, v in dictVar.items():
-                if k == ApiName:
-                    for k1, v1 in v.items():
-                        logger.debug(k1)
-                        for v2 in v1:
-                            fieldParam = v2.parameter
+            for key, value in dictVar.items():
+                if key == ApiName:
+                    for key1, value1 in value.items():
+                        logger.debug(key1)
+                        for value2 in value1:
+                            fieldParam = value2.parameter
                             #logger.debug("Parameter="+b)
                             #logger.debug(dictVar.get(b))
                             optional= dictVar.get(ApiName).get(fieldParam)[0].optional
@@ -1218,8 +1223,10 @@ class Validate():
                 if not dictVar==inputDict:
                     if stat == utilClass.read_property ('OK'):
                         dictVar=successDict
-                    elif stat == utilClass.read_property ('NOT_OK') or stat == utilClass.read_property ('NONE'):
+                    elif stat == utilClass.read_property ('NOT_OK'): #or stat == utilClass.read_property ('NONE'):
                         dictVar=failureDict
+                        """else:
+                            dictVar=successDict"""
                     else:
                         dictVar=successDict
                 if(dictVar==inputDict and inputValidation==utilClass.read_property("YES")):
@@ -1617,6 +1624,7 @@ class Validate():
                         break
             else:
                 stat = request.get(utilClass.read_property('STATUS'))
+                stat=str(stat)
                 if stat == utilClass.read_property ('OK'):
                     targetResponseStatus = utilClass.read_property('SUCCESS')
                 elif stat == utilClass.read_property ('NOT_OK'):
@@ -1647,6 +1655,7 @@ class Validate():
                         break
             else:          
                 stat= request.get (utilClass.read_property('STATUS'))
+                stat=str(stat)
                 if stat== utilClass.read_property ('OK'):
                     sourceTransmitStatus=utilClass.read_property ('SUCCESS')
                 elif stat == utilClass.read_property ('NOT_OK'):
@@ -1657,3 +1666,36 @@ class Validate():
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))  
         return sourceTransmitStatus
+    
+    
+    '''This method is used to get Session Expired response for valid_answer api.'''
+    def get_session_expired_response(self,output):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            encriptResponse=output[utilClass.read_property("JENCRESP")]
+            if encriptResponse==utilClass.read_property("SE"):
+                raise ValueError(utilClass.read_property("SESSION_EXPIRED"))  
+            else:
+                pass
+        except Exception:
+            raise ValueError(utilClass.read_property("SESSION_EXPIRED"))    
+        logger.info(utilClass.read_property("EXITING_METHOD"))   
+        
+        
+    '''This method is used to get Session Expired response for valid_answer api.'''
+    def invalid_data_account_info(self,output,apiName):  
+        utilClass=UtilClass()
+        logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        try:    
+            if apiName==utilClass.read_property("account_info"):
+                if output.get(utilClass.read_property('ERROR_MSG_SMALL'))=='':
+                    output[utilClass.read_property('STATUS')]=utilClass.read_property ("NOT_OK")
+                    output[utilClass.read_property('ERROR_MSG')]=utilClass.read_property("INVALID_VALUE_ACCOUNT_INFO")  
+                    del output[utilClass.read_property('ERROR_MSG_SMALL')]
+            else:
+                pass
+        except Exception as exception:
+            raise exception    
+        logger.info(utilClass.read_property("EXITING_METHOD"))   
+        return output
