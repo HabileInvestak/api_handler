@@ -22,10 +22,10 @@ class Validate():
         errorMsg = ""
         try:
             print "optional_validation"
-            if utilClass.is_blank(optional):
+            if utilClass.is_blank(str(optional)):
                 pass
             elif(optional == utilClass.read_property('YES')):
-                if utilClass.is_blank(paramValue) :
+                if utilClass.is_blank(str(paramValue)) :
                     if paramValue is not None:
                         arrayValue = [param]
                         errorMsg = self.create_error_message (utilClass.read_property ("MANDATORY_FIELD"), arrayValue)
@@ -1058,8 +1058,9 @@ class Validate():
                         errorList=self.data_type_validation(dataType,value,param,validValues,ApiName,dictVar)
                         errorListAll.extend (errorList)
                         if not errorList:
-                            errorList = self.valid_values_validation (validValues, value, param,dataType)
-                            errorListAll.extend (errorList)
+                            if utilClass.is_not_blank(str(value)):
+                                errorList = self.valid_values_validation (validValues, value, param,dataType)
+                                errorListAll.extend (errorList)
                         errorList=[]
         
             if errorListAll:
@@ -1088,7 +1089,7 @@ class Validate():
             if not (dataType == utilClass.read_property('JSON')):
                     if not (dataType == utilClass.read_property('LIST')):
                         logger.debug("==Inside valid values")
-                        if utilClass.is_blank(validValues):
+                        if utilClass.is_blank(str(validValues)):#and utilClass.is_blank(paramValue):
                             pass
                         else:
                             check=1
@@ -1096,7 +1097,7 @@ class Validate():
                             for word in words:
                                 if (str(paramValue)==word.strip()):
                                     check = 0
-                            if utilClass.is_not_blank(paramValue) and check==0:
+                            if utilClass.is_not_blank(str(paramValue)) and check==0:
                                 pass
                             else:
                                 arrayValue=[param,validValues,paramValue]
@@ -1127,7 +1128,7 @@ class Validate():
         try:
             #logger.debug("valid_values_validation="+validValues+"="+paramValue+"="+param+"="+dataType)
             if not (dataType == utilClass.read_property('JSON')):
-                if utilClass.is_blank(validValues):
+                if utilClass.is_blank(str(validValues)):
                     pass
                 else:
                     check=1
@@ -1135,7 +1136,7 @@ class Validate():
                     for word in words:
                         if (str(paramValue).__contains__(word.strip())):
                             check = 0
-                    if utilClass.is_not_blank(paramValue) and check==0:
+                    if utilClass.is_not_blank(str(paramValue)) and check==0:
                         pass
                     else:
                         arrayValue=[param,validValues,paramValue,validValuePath]
@@ -1303,7 +1304,7 @@ class Validate():
                         #listValue= dictVar.get(apiName).get(param)[0].transformation
                         if transformation:
                             if transformation in expectList:
-                                if utilClass.is_not_blank(value) and value in expectListValue:
+                                if utilClass.is_not_blank(str(value)) and value in expectListValue:
                                     value = self.transformation_validation (transformation, value)
                                     jsonObject[param] = value
                                 else:
@@ -1354,10 +1355,10 @@ class Validate():
         allList = returnAllDict.return_dict()
         listDict = allList[5]
         try:
-            if utilClass.is_blank(transformation):
+            if utilClass.is_blank(str(transformation)):
                 pass
             else:
-                if utilClass.is_not_blank(paramValue):
+                if utilClass.is_not_blank(str(paramValue)):
                     transformation=listDict.get(transformation).get(paramValue)[0].targetValue
                     paramValue=transformation
         except Exception as exception:
@@ -1371,9 +1372,9 @@ class Validate():
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))
         try:
-            if utilClass.is_blank(default):
+            if utilClass.is_blank(str(default)):
                 pass
-            elif(utilClass.is_blank(paramvalue)):
+            elif(utilClass.is_blank(str(paramvalue))):
                 paramvalue=default
         except Exception as exception:
             raise exception
