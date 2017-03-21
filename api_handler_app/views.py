@@ -95,11 +95,12 @@ def get_initial_token(request):
             jsonObject = json.loads (bodyContent)
             userId=jsonObject.get('uid')
             sourceRequest=jsonObject
-            result = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
+            resultAll = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
+            result=resultAll[0]
             requestValidateTimeStamp=datetime.now ()
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 sourceTransmitTimeStamp=datetime.now ()
-                sourceTransmit=result
+                sourceTransmit=resultAll
                 sourceTransmitStatus=validate.get_source_transmit_status(result)
                 auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -109,7 +110,7 @@ def get_initial_token(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response(result,status=status.HTTP_200_OK)
+                return Response(resultAll,status=status.HTTP_200_OK)
             tomcatCount=""
             jKey=""
             jData=""
@@ -168,7 +169,7 @@ def get_initial_token(request):
             print "output",output
             responseValidateTimeStamp=datetime.now ()
             sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmitStatus=validate.get_source_transmit_status(output[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -271,11 +272,12 @@ def get_login_mode(request):
                 jsonObject = json.loads (bodyContent)
                 userId=jsonObject.get('uid')
                 sourceRequest=jsonObject
-                result = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
+                resultAll = validate.validation_and_manipulation (jsonObject, apiName,inputDict)
+                result=resultAll[0]
                 requestValidateTimeStamp=datetime.now ()
                 if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                     sourceTransmitTimeStamp=datetime.now ()
-                    sourceTransmit=result
+                    sourceTransmit=resultAll
                     sourceTransmitStatus=validate.get_source_transmit_status(result)
                     auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                       targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -285,7 +287,7 @@ def get_login_mode(request):
                     auditThread.daemon = True
                     auditThread.start()
                     logger.info(utilClass.read_property("EXITING_METHOD"))
-                    return Response(result,status=status.HTTP_200_OK)
+                    return Response(resultAll,status=status.HTTP_200_OK)
             tomcatCount=""
             jKey=""
             jData=""
@@ -314,7 +316,7 @@ def get_login_mode(request):
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
             responseValidateTimeStamp=datetime.now ()
             sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmitStatus=validate.get_source_transmit_status(output[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -424,17 +426,18 @@ def get_login_2fa(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             sourceRequest=jsonObject
             logger.debug("before validation_and_manipulation")
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            resultAll = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            result=resultAll[0]
             requestValidateTimeStamp=datetime.now ()
             logger.debug("After validation_and_manipulation="+str(result))
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 logger.debug("Inside Status")
                 sourceTransmitTimeStamp=datetime.now ()
-                sourceTransmit=result
+                sourceTransmit=resultAll
                 sourceTransmitStatus=validate.get_source_transmit_status(result)
                 auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -444,7 +447,7 @@ def get_login_2fa(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result)
+                return Response (resultAll,status=status.HTTP_200_OK)
             publicKey3=requestObj.import_key(publicKey3Pem)
             encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
             if(utilClass.read_property('RSA')==encryptionMethod):
@@ -471,7 +474,7 @@ def get_login_2fa(request):
             output = validate.validation_and_manipulation (output, apiName,dictionary)  # manipulation logic and call api_response_audit
             responseValidateTimeStamp=datetime.now ()
             sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmitStatus=validate.get_source_transmit_status(output[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -481,7 +484,7 @@ def get_login_2fa(request):
             auditThread.daemon = True
             auditThread.start()
             logger.info(utilClass.read_property("EXITING_METHOD"))
-            return Response(output)           
+            return Response(output,status=status.HTTP_200_OK)           
     except Exception as exception:
         logger.exception(exception)
         err=str(exception)
@@ -496,7 +499,7 @@ def get_login_2fa(request):
                                                   sourceTransmitStatus, ipAddress))
         auditThread.daemon = True
         auditThread.start()
-        return Response(output)
+        return Response(output,status=status.HTTP_200_OK)
     
 
     
@@ -584,12 +587,13 @@ def get_valid_pwd(request):
                 return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             sourceRequest=jsonObject
-            result = validate.validation_and_manipulation (jsonObject,apiName,inputDict)
+            resultAll = validate.validation_and_manipulation (jsonObject,apiName,inputDict)
+            result=resultAll[0]
             requestValidateTimeStamp=datetime.now ()
             logger.debug(result)
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 sourceTransmitTimeStamp=datetime.now ()
-                sourceTransmit=result
+                sourceTransmit=resultAll
                 sourceTransmitStatus=validate.get_source_transmit_status(result)
                 auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -599,7 +603,7 @@ def get_valid_pwd(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response(result,status=status.HTTP_200_OK)
+                return Response(resultAll,status=status.HTTP_200_OK)
     
             result = utilClass.password_hash(result)
             jsonData = json.dumps (result)
@@ -629,7 +633,7 @@ def get_valid_pwd(request):
             output = validate.validation_and_manipulation (output, apiName, dictionary)  #manipulation logic and call auditTrial.api_response_audit
             responseValidateTimeStamp=datetime.now ()
             sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmitStatus=validate.get_source_transmit_status(output[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -743,11 +747,12 @@ def get_valid_ans(request):
                 return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             sourceRequest=jsonObject
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            resultAll = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            result=resultAll[0]
             requestValidateTimeStamp=datetime.now ()
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 sourceTransmitTimeStamp=datetime.now ()
-                sourceTransmit=result
+                sourceTransmit=resultAll
                 sourceTransmitStatus=validate.get_source_transmit_status(result)
                 auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -757,7 +762,7 @@ def get_valid_ans(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result,status=status.HTTP_200_OK)
+                return Response (resultAll,status=status.HTTP_200_OK)
             jsonData = json.dumps(result)
             publicKey3=requestObj.import_key(publicKey3Pem)
             encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
@@ -805,8 +810,8 @@ def get_valid_ans(request):
             logger.debug(str(decryptedJson))
             decryptedJson = validate.validation_and_manipulation (decryptedJson, apiName,dictionary)  # manipulation logic and call auditTrial.api_response_audit
             responseValidateTimeStamp=datetime.now ()
-            sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmit=decryptedJson
+            sourceTransmitStatus=validate.get_source_transmit_status(decryptedJson[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -922,11 +927,12 @@ def get_api_handler_request(request):
                 return Response (result,status=status.HTTP_200_OK)
             jsonObject = json.loads (bodyContent)
             sourceRequest=jsonObject
-            result = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            resultAll = validate.validation_and_manipulation (jsonObject, apiName, inputDict)
+            result=resultAll[0]
             requestValidateTimeStamp=datetime.now ()
             if utilClass.read_property("STATUS") in result and result[utilClass.read_property("STATUS")]==utilClass.read_property("NOT_OK"):
                 sourceTransmitTimeStamp=datetime.now ()
-                sourceTransmit=result
+                sourceTransmit=resultAll
                 sourceTransmitStatus=validate.get_source_transmit_status(result)
                 auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 
@@ -936,7 +942,7 @@ def get_api_handler_request(request):
                 auditThread.daemon = True
                 auditThread.start()
                 logger.info(utilClass.read_property("EXITING_METHOD"))
-                return Response (result,status=status.HTTP_200_OK)
+                return Response (resultAll,status=status.HTTP_200_OK)
             jsonData = json.dumps(result)
             publicKey4 = requestObj.import_key(publicKey4Pem)
             encryptionMethod=systemDict.get(sourceUrl)[0].encryptionMethod
@@ -966,7 +972,7 @@ def get_api_handler_request(request):
             print 'output',output
             responseValidateTimeStamp=datetime.now ()
             sourceTransmit=output
-            sourceTransmitStatus=validate.get_source_transmit_status(output)
+            sourceTransmitStatus=validate.get_source_transmit_status(output[0])
             sourceTransmitTimeStamp=datetime.now ()
             auditThread = Thread(target =auditTrial.all_request_response_audit,args=(sourceUrl, userId, apiName, sourceRequestTimeStamp, requestValidateTimeStamp, 
                                                   targetTransmitTimeStamp, targetResponseTimeStamp, responseValidateTimeStamp, 

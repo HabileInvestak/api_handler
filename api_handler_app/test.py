@@ -1,4 +1,25 @@
-from properties.p import Property
+
+
+x = [1,2,3]
+y = [4,5,6]
+x.append(y)
+print x
+
+msg={}
+list=[]
+list.append('1')
+list.append('2')
+msg['w']=list
+v=msg['w']
+v.append('3')
+msg['w']=v
+v1='hi2'
+
+if 'w' in msg:
+    pass
+
+
+"""from properties.p import Property
 from datetime import datetime
 import json
 from django.http import JsonResponse
@@ -11,6 +32,27 @@ from xlrd import *
 import win32com.client
 import csv
 import sys
+
+
+
+warningDict={
+    u"Status": u"cancelled",
+    u"stat": u"Ok"
+    }
+
+warningList = []
+for k,v in warningDict.items():
+    warningMsg=k+":"+v+" "+"is an extra field"        
+    warningList.append(warningMsg)
+print warningList
+
+
+
+
+
+
+
+
 
 try:
     xlApp = win32com.client.Dispatch("Excel.Application")
@@ -43,10 +85,10 @@ print output
 output['warningList']=invalidList
 print output
 
-"""for inv in invalidList:
+for inv in invalidList:
     #output.setdefault('Warning List') , [])
     output.setdefault('Warning List', [])
-    output['Warning List'].append(inv)"""
+    output['Warning List'].append(inv)
     
 
 
@@ -435,4 +477,4 @@ for v in errorList:
     response_data[readProperty('STATUS')] = stat
 
 print 'response_data',response_data
-print response_data
+print response_data"""

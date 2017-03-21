@@ -12,7 +12,7 @@ class ReturnAllDict():
     def update_excel_property(self):
         try:
             prop=Property()
-            propObj = prop.load_property_files('E:\\Investak\\investak_local.properties')   #Ranjith Local
+            propObj = prop.load_property_files('E:\\Investak\\New wrkspc\\investak_local.properties')   #Ranjith Local
             #propObj = prop.load_property_files('C:\\Users\\Administrator\\Documents\\Investak\\working code\\investak.properties')  #Server
             a = ExcelSheetApi()
             i = ExcelSheetInput()

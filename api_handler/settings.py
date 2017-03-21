@@ -50,7 +50,7 @@ LOGGING = {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             #'filename': 'C:\\Users\\Administrator\\Documents\\Investak\\working code\\logger.log',  #Server
-            'filename': 'E:\\Investak\\bugfix wrkspc\\logger.log',  #Ranjith
+            'filename': 'E:\\Investak\\New wrkspc\\logger.log',  #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\logger.log',  #Hari
            # 'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
@@ -60,7 +60,7 @@ LOGGING = {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             #'filename': 'C:\\Users\\Administrator\\Documents\\Investak\\working code\\django_request.log',  #Server
-            'filename': 'E:\\Investak\\bugfix wrkspc\\django_request.log',    #Ranjith
+            'filename': 'E:\\Investak\\New wrkspc\\django_request.log',    #Ranjith
            #'filename': 'D:\\InvestAK\\26-12-2016\\django_request.log',  #Hari
             #'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
@@ -135,7 +135,7 @@ WSGI_APPLICATION = 'api_handler.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'investak_api_handler',
+        'NAME': 'investak_api_handler_server',
         'USER': 'postgres',
        # 'PASSWORD': 'root',
        # 'HOST': '127.0.0.1',
