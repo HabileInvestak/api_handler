@@ -979,7 +979,7 @@ class Validate():
                             arrayValue = [param,ApiName]
                             errorMsg = self.create_error_message (utilClass.read_property ("MISSING_FIELD_JSON_ARRAY"), arrayValue)
                             errorList.append(errorMsg)
-                    else:
+                    elif dictVar==successDict:
                         if param in content:
                             pass
                         else:
