@@ -82,7 +82,7 @@ class Validate():
             if paramValue:
                 logger.debug(paramValue)
                 print 'paramValue',paramValue
-                if(str(paramValue).isdigit()):
+                if(str(abs(int(paramValue))).isdigit()):
                     pass
                 else:
                     arrayValue = [param, dataType,validValues]
@@ -102,6 +102,8 @@ class Validate():
             if paramValue=='00.00':
                 paramValue='0.00'
                 logger.debug("paramValue replace"+paramValue)
+            paramValue = str(paramValue).replace(',', '')
+            paramValue = str(paramValue).replace(" ", "")
             print 'paramValue',paramValue
             if paramValue and str(paramValue)!=utilClass.read_property("NA"):
                 splitNum=str(paramValue).split('.', 1)
@@ -256,12 +258,20 @@ class Validate():
                 dataType=jsonDict.get(validValues).get(paramTemp)[0].dataType
                 validValuesInner=jsonDict.get(validValues).get(paramTemp)[0].validValues
                 errorList=self.data_type_validation(dataType,paramValueTemp,paramTemp,validValuesInner,ApiName,jsonDict,content)
-                for errorMsgTemp in errorList:
-                    if errorMsgTemp:
+                if errorList:
+                    for errorMsgTemp in errorList:
+                        if errorMsgTemp:
+                            if errorMsg:
+                                errorMsg=errorMsg+","+errorMsgTemp
+                            else:
+                                errorMsg=errorMsg+errorMsgTemp
+                else:
+                    errorMsgValid=self.valid_values_validation_JSON(validValuesInner,paramValueTemp,paramTemp,dataType,validValues)
+                    if errorMsgValid:
                         if errorMsg:
-                            errorMsg=errorMsg+","+errorMsgTemp
+                            errorMsg=errorMsg+","+errorMsgValid
                         else:
-                            errorMsg=errorMsg+errorMsgTemp
+                            errorMsg=errorMsg+errorMsgValid
                 logger.debug("errorMsg=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@"+errorMsg) 
         except Exception as exception:
             raise exception   
@@ -289,12 +299,20 @@ class Validate():
                 dataType=jsonDict.get(validValues).get(paramTemp)[0].dataType
                 validValuesInner=jsonDict.get(validValues).get(paramTemp)[0].validValues
                 errorList=self.data_type_validation(dataType,paramValueTemp,paramTemp,validValuesInner,ApiName,jsonDict,content)
-                for errorMsgTemp in errorList:
-                    if errorMsgTemp:
+                if errorList:
+                    for errorMsgTemp in errorList:
+                        if errorMsgTemp:
+                            if errorMsg:
+                                errorMsg=errorMsg+","+errorMsgTemp
+                            else:
+                                errorMsg=errorMsg+errorMsgTemp
+                else:
+                    errorMsgValid=self.valid_values_validation_JSON(validValuesInner,paramValueTemp,paramTemp,dataType,validValues)
+                    if errorMsgValid:
                         if errorMsg:
-                            errorMsg=errorMsg+","+errorMsgTemp
+                            errorMsg=errorMsg+","+errorMsgValid
                         else:
-                            errorMsg=errorMsg+errorMsgTemp
+                            errorMsg=errorMsg+errorMsgValid
                 logger.debug("errorMsg=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@=@"+errorMsg) 
         except Exception as exception:
             raise exception   
@@ -340,11 +358,11 @@ class Validate():
                         if errorMsg:
                             if errorMsgAll:
                                 arrayValue = [errorMsgAll,errorMsg,validValues]
-                                errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_JSON_ARRAY_EXIST"), arrayValue)
+                                errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_VALUE_JSON_ARRAY_EXIST"), arrayValue)
                                 #errorMsgAll=errorMsgAll+","+errorMsg+" in "+validValues+" Json Array Sheet"
                             else:
                                 arrayValue = [errorMsgAll,errorMsg,validValues]
-                                errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_JSON_ARRAY_NEW"), arrayValue)
+                                errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_VALUE_JSON_ARRAY_NEW"), arrayValue)
                                 #errorMsgAll=errorMsgAll+errorMsg+" in "+validValues+" Json Array Sheet"          
         except Exception as exception:
             raise exception
@@ -386,12 +404,13 @@ class Validate():
                     if errorMsg:
                         if errorMsgAll:
                             arrayValue = [errorMsgAll,errorMsg,validValues]
-                            errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_JSON_ARRAY_EXIST"), arrayValue)
+                            errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_VALUE_JSON_ARRAY_EXIST"), arrayValue)
                             #errorMsgAll=errorMsgAll+","+errorMsg+" in "+validValues+" Json Array Sheet"
                         else:
                             arrayValue = [errorMsgAll,errorMsg,validValues]
-                            errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_JSON_ARRAY_NEW"), arrayValue)
+                            errorMsgAll = self.create_error_message (utilClass.read_property ("INVALID_DATATYPE_VALUE_JSON_ARRAY_NEW"), arrayValue)
                             #errorMsgAll=errorMsgAll+errorMsg+" in "+validValues+" Json Array Sheet"   
+                    
                     #errorMsgAll=errorMsg+" in "+validValues+" Json Array Sheet"                 
         except Exception as exception:
             raise exception
@@ -965,10 +984,10 @@ class Validate():
             expectLen=len (expectList)
             contentLen=len (content)
             logger.debug(content)
-            """if (expectLen != contentLen) and not dictVar==jsonDict and dictVar==inputDict: #<
+            if (expectLen != contentLen) and not dictVar==jsonDict and dictVar==inputDict: #<
                 arrayValue = [expectLen,contentLen]
                 expectMsg = self.create_error_message (utilClass.read_property ("EXPECTED_AVAILABLE_PARAMETERS"), arrayValue)
-                errorList.append (expectMsg)"""
+                errorList.append (expectMsg)
             print content
             if not errorList:
                 for param in expectList:
@@ -990,31 +1009,31 @@ class Validate():
                         #invalidDict[utilClass.read_property ("INVALID_FIELD")]=+" in "+validValues+" Json Array Sheet"
             
             #if not errorList:
-            print "content==================",content
-            if type(content) is list:
-                
-                """for param in content:
-                    if (param in expectList):
-                        pass
-                    else:
-                        if(dictVar==successDict or dictVar==jsonDict):
-                            invalidDict.setdefault(utilClass.read_property ('WARNING_LIST'), []).append(param)
-                            #invalidDict[utilClass.read_property ('WARNING_LIST')].append(param)
+                print "content==================",content
+                if type(content) is list:
+                    
+                    """for param in content:
+                        if (param in expectList):
+                            pass
                         else:
-                            arrayValue = [param]
-                            errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
-                            errorList.append(errorMsg)"""
-            else:
-                for param, value in content.items():
-                    if (param in expectList):
-                        pass
-                    else:
-                        if(dictVar==successDict or dictVar==jsonDict):
-                            invalidDict[param]=value
+                            if(dictVar==successDict or dictVar==jsonDict):
+                                invalidDict.setdefault(utilClass.read_property ('WARNING_LIST'), []).append(param)
+                                #invalidDict[utilClass.read_property ('WARNING_LIST')].append(param)
+                            else:
+                                arrayValue = [param]
+                                errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
+                                errorList.append(errorMsg)"""
+                else:
+                    for param, value in content.items():
+                        if (param in expectList):
+                            pass
                         else:
-                            arrayValue = [param]
-                            errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
-                            errorList.append(errorMsg)
+                            if(dictVar==successDict or dictVar==jsonDict):
+                                invalidDict[param]=value
+                            else:
+                                arrayValue = [param]
+                                errorMsg = self.create_error_message (utilClass.read_property ("INVALID_FIELD"), arrayValue)
+                                errorList.append(errorMsg)
             if errorList:
                 isErrorAvailable = True
         except Exception as exception:
@@ -1209,7 +1228,7 @@ class Validate():
         errorMsg=''
         try:
             #logger.debug("valid_values_validation="+validValues+"="+paramValue+"="+param+"="+dataType)
-            if not (dataType == utilClass.read_property('JSON')):
+            if not (dataType == utilClass.read_property('JSON')) and not (dataType == utilClass.read_property('JSONLIST')) and not (dataType == utilClass.read_property('LIST')):
                 if utilClass.is_blank(str(validValues)):
                     pass
                 else:
@@ -1865,7 +1884,9 @@ class Validate():
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))  
         sourceUrl=''
-        try:    
+        try:
+            logger.debug(systemDict)
+            logger.debug(requestUrl)        
             sourceUrl=systemDict.get(requestUrl)[0].sourceUrl
         except Exception:
             raise ValueError(utilClass.read_property("INVALID_SOURCE_URL"))     

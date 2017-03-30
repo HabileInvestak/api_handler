@@ -1,3 +1,33 @@
+import json
+
+paramValue=-2
+p=str(paramValue)
+print p
+if paramValue:
+    print 'paramValue',paramValue
+    if(str(abs(paramValue)).isdigit()):
+        pass
+    else:
+        print 'error'
+
+paramValue=1351.15
+paramValue = str(paramValue).replace(',', '')
+paramValue = str(paramValue).replace(" ", "")
+if paramValue=='00.00':
+    paramValue='0.00'
+print 'paramValue',paramValue
+try:
+    if paramValue and str(paramValue)!="NA":
+        splitNum=str(paramValue).split('.', 1)
+        if(str(paramValue).isdigit()):
+            pass
+        elif (isinstance (json.loads (str(paramValue)), (float)) and str(splitNum[1]).isdigit() and str(abs(int(splitNum[0]))).isdigit ()):#-ve value replace to +ve value
+            pass
+        else:
+            print 'error'
+except Exception as e:
+    print "exception is ",e    
+
 
 
 x = [1,2,3]

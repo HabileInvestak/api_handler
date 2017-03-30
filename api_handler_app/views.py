@@ -1008,14 +1008,17 @@ def get_excel_property_update(request):
     validate=Validate()
     output={}
     try:
+        #ReturnAllDict().update_excel_property()
+        #return JsonResponse("ok",status=status.HTTP_200_OK, safe=False)
         if request.method == utilClass.read_property ('METHOD_TYPE'):
             ReturnAllDict().update_excel_property()
             msg=utilClass.read_property("UPDATE_EXCEL_PROPERTY")
             output[utilClass.read_property ('MESSAGE')]=msg
             output[utilClass.read_property ('STATUS')]=utilClass.read_property ('OK')
-            return JsonResponse(output,status=status.HTTP_200_OK) 
-    except Exception:
+            return JsonResponse(output,status=status.HTTP_200_OK)
+    except Exception as exception:
         msg=utilClass.read_property("UPDATE_EXCEL_PROPERTY_FAIL")
+        msg=str(exception)
         output=validate.create_error_response(msg)
         return Response(output,status=status.HTTP_200_OK)  
    

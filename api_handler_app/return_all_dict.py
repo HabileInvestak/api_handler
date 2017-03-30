@@ -1,7 +1,9 @@
 from api_handler_app.excel_sheet import *
 from properties.p import Property
+import logging
 
 listOfDict=[]
+logger = logging.getLogger('api_handler_app.return_all_dict.py')
 
 '''This class is used for initially read all excel sheet or update all excel sheet with property file to return as a list.
 we will use this list which contains all excel sheets for validation when apiName is call'''
@@ -31,7 +33,8 @@ class ReturnAllDict():
             listOfDictTemp=[apiHomeDict,inputDict,successDict,failureDict,jsonDict,listDict,propObj,systemDict]
             global listOfDict
             listOfDict=listOfDictTemp
-            print "call Loading dictioanry from excel once deployment"
+            print "call Loading dictionary from excel once deployment"
+            logger.info("call Loading dictionary from excel once deployment")
             return listOfDict
         except Exception as exception:
             print 'Excel read exception',exception
