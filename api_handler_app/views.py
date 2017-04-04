@@ -1077,7 +1077,7 @@ def page_not_found(request):
         validate=Validate()
         output=validate.create_error_response(utilClass.read_property("INVALID_URL"))
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return JsonResponse(output)
+        return JsonResponse(output,safe=False)
     except Exception as exception:
         logger.exception(exception)
         raise Exception(exception)      
@@ -1093,7 +1093,7 @@ def server_error(request):
         validate=Validate()
         output=validate.create_error_response(utilClass.read_property("SERVER_ERROR"))
         logger.info(utilClass.read_property("EXITING_METHOD"))
-        return JsonResponse(output)
+        return JsonResponse(output,safe=False)
     except Exception as exception:
         logger.exception(exception)
         raise Exception(exception)      

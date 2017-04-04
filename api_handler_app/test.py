@@ -1,5 +1,25 @@
 import json
 
+
+
+
+
+contentList=['1','2','1']
+content={}
+try:
+    for list in contentList:
+        if contentList.count(list) > 1:
+            print "dublicate key is ",list
+            contentList.remove(list)
+except Exception as e:
+    print "exception is ",e 
+
+
+
+
+
+
+
 paramValue=-2
 p=str(paramValue)
 print p
