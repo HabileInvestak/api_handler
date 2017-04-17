@@ -14,7 +14,7 @@ class ExcelSheetApi():
         logger.info(propObj.get("ENTERING_METHOD"))
         #wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"),Password='12345')
         wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
-        sheet = wb.sheet_by_index(2)
+        sheet = wb.sheet_by_index(3)
         rows=sheet.nrows
         #colmns=sheet.ncols
         apiHomeDict = {}
@@ -34,11 +34,11 @@ class ExcelSheetApi():
                 inputApi = str(sheet.cell(rownum, 9).value).strip()
                 inputEncryption = str(sheet.cell(rownum, 10).value).strip()
                 resonseDecryption = str(sheet.cell(rownum, 11).value).strip()
-                notes = (sheet.cell(rownum, 12).value).encode('utf-8').strip()
-                inputSample = str(sheet.cell(rownum, 13).value).strip()
-                inputValidation = str(sheet.cell(rownum, 14).value).strip()
-                responseValidation = str(sheet.cell(rownum, 15).value).strip()
-                a=ApiClass(hashApi,source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseDecryption,notes,inputSample,inputValidation,responseValidation)
+                inputValidation = str(sheet.cell(rownum, 12).value).strip()
+                responseValidation = str(sheet.cell(rownum, 13).value).strip()
+                notes = (sheet.cell(rownum, 14).value).encode('utf-8').strip()
+                inputSample = str(sheet.cell(rownum, 15).value).strip()
+                a=ApiClass(hashApi,source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseDecryption,inputValidation,responseValidation,notes,inputSample)
     
                 apiHomeDict[apiName] = [a]
 
@@ -355,7 +355,7 @@ class ExcelSheetSystem():
     def system_dict(self,propObj):
         logger.info(propObj.get("ENTERING_METHOD"))
         wb = open_workbook (propObj.get("API_DICTIONARY_EXCEL"))
-        sheet = wb.sheet_by_index(1)
+        sheet = wb.sheet_by_index(2)
         rows=sheet.nrows
         #colmns=sheet.ncols
         systemDict = {}
@@ -372,11 +372,10 @@ class ExcelSheetSystem():
                 loggingRequired =  str(sheet.cell(rownum, 6).value).strip()
                 recordSeperator =  str(sheet.cell(rownum, 7).value).strip()
                 fieldSeperator =  str(sheet.cell(rownum, 8).value).strip()
-                notes =  str(sheet.cell(rownum, 9).value).encode('utf-8').strip()
-                sourceUrl =  str(sheet.cell(rownum, 10).value).strip()
-                targetUrl =  str(sheet.cell(rownum, 11).value).strip()
-                
-                sys=SystemClass(systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,notes,sourceUrl,targetUrl)
+                sourceUrl =  str(sheet.cell(rownum, 9).value).strip()
+                targetUrl =  str(sheet.cell(rownum, 10).value).strip()
+                notes = (sheet.cell(rownum, 11).value).encode('utf-8').strip()
+                sys=SystemClass(systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,sourceUrl,targetUrl,notes)
                 
                 systemDict[sourceUrl] = [sys]
                 

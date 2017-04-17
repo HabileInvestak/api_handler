@@ -25,14 +25,14 @@ class Validate():
             print "optional_validation"
             if utilClass.is_blank(str(optional)):
                 pass
-            elif(optional == utilClass.read_property('YES')):
+            elif(optional == utilClass.read_property('YES') or optional == utilClass.read_property('INFO')):
                 if utilClass.is_blank(str(paramValue)) :
                     if paramValue is not None:
                         arrayValue = [param]
                         errorMsg = self.create_error_message (utilClass.read_property ("MANDATORY_FIELD"), arrayValue)
             if errorMsg:
                 errorList.append (errorMsg)
-            print "oprional validation end "
+            print "optional validation end "
         except Exception as exception:
             raise exception
         logger.info(utilClass.read_property("EXITING_METHOD"))
@@ -776,14 +776,14 @@ class Validate():
                             #logger.debug(dictVar.get(b))
                             optional= dictVar.get(apiName).get(fieldParam)[0].optional
                             #logger.debug("optional====="+optional) 
-                            if (optional == utilClass.read_property('YES')):
+                            if (optional == utilClass.read_property('YES') or optional == utilClass.read_property('INFO')):
                                 #logger.debug("Yes="+b)
                                 if (fieldParam in expectList):
                                     #logger.debug("In expect list")
                                     paramValue=content[fieldParam]
                                     #logger.debug(paramValue)
                                     if paramValue is not None:
-                                        paramValue=paramValue.strip()
+                                        paramValue=str(paramValue).strip()
                                     if not paramValue:
                                         if paramValue is not None:
                                             arrayValue = [fieldParam]
@@ -1377,14 +1377,14 @@ class Validate():
                             optional= dictVar.get(apiName).get(fieldParam)[0].optional
                             default= dictVar.get(apiName).get(fieldParam)[0].default 
                             if (fieldParam not in expectList):
-                                if default and optional == utilClass.read_property('YES'):
+                                if default and (optional == utilClass.read_property('YES') or optional == utilClass.read_property('INFO')):
                                     jsonObject[fieldParam]=default
-                                elif optional == utilClass.read_property('YES'):
+                                elif optional == utilClass.read_property('YES') or optional == utilClass.read_property('INFO'):
                                     arrayValue = [fieldParam]
                                     errorMsg = self.create_error_message (utilClass.read_property ("MANDATORY_FIELD"), arrayValue)
                                     errorList.append(errorMsg)
-                                elif optional != utilClass.read_property('YES'): 
-                                    jsonObject[fieldParam]=''
+                                """elif optional != utilClass.read_property('YES') or optional != utilClass.read_property('INFO'): 
+                                    jsonObject[fieldParam]=''""" #not to add input request if non mandatory field is present.
             print 'After Change Input ',jsonObject              
             if errorList:
                 isErrorAvailale = True
@@ -1709,6 +1709,7 @@ class Validate():
     def get_source_transmit_status(self,request):  
         utilClass=UtilClass()
         logger.info(utilClass.read_property("ENTERING_METHOD"))  
+        sourceTransmitStatus=''
         try:    
             if type(request) is list:
                 for dict_var in request:

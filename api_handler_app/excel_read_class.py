@@ -2,7 +2,7 @@
 class ApiClass(object):
 
     '''This method is used to initialize api excel sheet'''
-    def __init__(self, hashApi, source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseDecryption,notes,inputSample,inputValidation,responseValidation):
+    def __init__(self, hashApi, source,subject,ch,apiName,description,sourceUrl,url,logging,inputApi,inputEncryption,resonseDecryption,inputValidation,responseValidation,notes,inputSample):
         self.hashApi = hashApi
         self.source = source
         self.subject = subject
@@ -15,10 +15,10 @@ class ApiClass(object):
         self.inputApi = inputApi
         self.inputEncryption = inputEncryption
         self.resonseDecryption = resonseDecryption
-        self.notes = notes
-        self.inputSample = inputSample
         self.inputValidation = inputValidation
         self.responseValidation = responseValidation
+        self.notes = notes
+        self.inputSample = inputSample
 
 
 '''This class is used to initialize input excel sheet'''
@@ -103,7 +103,7 @@ class ListClass(object):
 class SystemClass(object):
 
     '''This method is used to initialize list excel sheet'''
-    def __init__(self,systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,notes,sourceUrl,targetUrl):
+    def __init__(self,systemColHash,systemName,systemType,dataContainerType,targetDeliveryLocation,encryptionMethod,loggingRequired,recordSeperator,fieldSeperator,sourceUrl,targetUrl,notes):
         self.systemColHash = systemColHash
         self.systemName = systemName
         self.systemType = systemType
@@ -113,6 +113,6 @@ class SystemClass(object):
         self.loggingRequired = loggingRequired
         self.recordSeperator = recordSeperator
         self.fieldSeperator = fieldSeperator
-        self.notes = notes
         self.sourceUrl = sourceUrl
         self.targetUrl = targetUrl
+        self.notes = notes
